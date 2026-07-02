@@ -6,9 +6,15 @@
     <title>Pro-Grade Industrial Hardware</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --gray: #f4f4f4; --navy: #001f3f; }
+        :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --gray: #f4f4f4; --navy: #001f3f; --purple: #9d00ff; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); color: #333; line-height: 1.4; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gold); color: #333; line-height: 1.4; }
+
+        /* Welcome Page Styles */
+        #landing-page { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: var(--onyx); color: var(--gold); padding: 20px; }
+        #landing-page h1 { font-size: 3rem; margin-bottom: 20px; }
+        .btn-shop { background: var(--gold); color: var(--onyx); padding: 15px 40px; font-size: 1.2rem; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; margin-top: 20px; }
+        #main-shop { display: none; }
 
         /* Navigation Styles */
         .menu-btn { position: absolute; top: 20px; left: 20px; font-size: 24px; color: var(--gold); cursor: pointer; z-index: 1000; }
@@ -20,15 +26,18 @@
 
         /* Header */
         header { background: var(--onyx); color: var(--gold); padding: 25px 15px; text-align: center; border-bottom: 4px solid var(--gold); }
-        header h1 { font-size: 1.2rem; letter-spacing: 1px; text-transform: uppercase; }
+        header h1 { font-size: 2.2rem; letter-spacing: 1px; text-transform: uppercase; }
 
         /* Search & Slideshow */
-        .search-wrap { background: #e0e0e0; padding: 30px 10px; text-align: center; position: relative; overflow: hidden; }
+        .search-wrap { background-color: rgb(83, 92, 92); padding: 30px 10px; text-align: center; position: relative; overflow: hidden; }
         .slideshow-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
         .slideshow-container img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 1.5s ease-in-out; }
         .slideshow-container img.active { opacity: 0.7; }
         
-        #search-bar { position: relative; z-index: 1; width: 95%; max-width: 500px; padding: 10px; border: 2px solid var(--gold); border-radius: 4px; font-size: 14px; outline: none; background: rgba(255,255,255,0.9); }
+        /* Updated Search Bar Styles */
+        .search-container { position: relative; z-index: 1; width: 95%; max-width: 500px; margin: 0 auto; display: flex; align-items: center; }
+        #search-bar { width: 100%; padding: 12px 40px 12px 20px; border: none; border-radius: 50px; font-size: 14px; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .search-icon-btn { position: absolute; right: 15px; cursor: pointer; color: #666; font-size: 18px; border: none; background: transparent; }
 
         /* Product Grid */
         .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; padding: 10px; max-width: 1200px; margin: auto; }
@@ -38,11 +47,9 @@
         .price { color: var(--gold); font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; }
         .card p { font-size: 0.75rem; margin-bottom: 5px; }
         
-        /* Buttons */
         .btn-whatsapp { display: block; background: var(--onyx); color: var(--gold); text-align: center; padding: 8px; text-decoration: none; font-size: 0.8rem; font-weight: bold; border-radius: 4px; border: 1px solid var(--gold); transition: 0.3s; }
         .btn-whatsapp:hover { background: var(--gold); color: var(--onyx); }
         
-        /* Footer */
         footer { background: var(--onyx); color: var(--white); padding: 30px 10px; text-align: center; margin-top: 20px; font-size: 0.75rem; }
         footer a { color: var(--white); text-decoration: none; }
         footer i { color: var(--gold); font-size: 1.2rem; margin-bottom: 5px; display: block; }
@@ -50,61 +57,75 @@
 </head>
 <body>
 
-<div class="menu-btn" onclick="toggleNav()"><i class="fas fa-bars"></i></div>
-<div class="profile-btn"><i class="fas fa-user-circle"></i></div>
-
-<div id="mySidenav" class="side-nav">
-    <a href="javascript:void(0)" class="close-btn" onclick="toggleNav()">&times;</a>
-    <a href="#">Product Categories</a>
-    <a href="mailto:kenkeys10000@gmail.com">Customer Support</a>
-    <a href="#">Store Location</a>
-    <a href="#">About Us</a>
-    <a href="#">Contact Us</a>
-    <a href="#">FAQ</a>
-</div>
-
-<header>
-    <h1><i class="fas fa-tools"></i> PRECISION HARDWARE</h1>
+<div id="landing-page">
+    <h1>Welcome to Precision Hardware</h1>
     <p>Professional Tools for Heavy Duty Performance</p>
-</header>
-
-<div class="search-wrap">
-    <div class="slideshow-container" id="slideshow">
-        <img src="download1.jpg" class="active" alt="Tool 1">
-        <img src="precision.jpg" alt="Tool 2">
-        <img src="drill.jpg" alt="Tool 3">
-        <img src="Nut.jpg" alt="Tool 4">
-    </div>
-    <input type="text" id="search-bar" placeholder="🔍 Search by tool name or specification...">
+    <button class="btn-shop" onclick="showShop()">Shop Now</button>
 </div>
 
-<main id="product-container" class="container"></main>
+<div id="main-shop">
+    <div class="menu-btn" onclick="toggleNav()"><i class="fas fa-bars"></i></div>
+    <div class="profile-btn"><i class="fas fa-user-circle"></i></div>
 
-<footer>
-    <a href="mailto:kenkeys10000@gmail.com">
-        <i class="fas fa-headset"></i>
-        <h3>Support & Sales</h3>
-    </a>
-    <p>Available on WhatsApp: +256 743 462 531</p>
-    <p>&copy; 2026 Industrial Hardware Solutions</p>
-</footer>
+    <div id="mySidenav" class="side-nav">
+        <a href="javascript:void(0)" class="close-btn" onclick="toggleNav()">&times;</a>
+        <a href="#">Product Categories</a>
+        <a href="mailto:kenkeys10000@gmail.com">Customer Support</a>
+        <a href="#">Store Location</a>
+        <a href="#">About Us</a>
+        <a href="#">Contact Us</a>
+        <a href="#">FAQ</a>
+    </div>
+
+    <header>
+        <h1><i class="fas fa-tools"></i> PRECISION HARDWARE</h1>
+        <p>Professional Tools for Heavy Duty Performance</p>
+    </header>
+
+    <div class="search-wrap">
+        <div class="slideshow-container" id="slideshow">
+            <img src="download1.jpg" class="active" alt="Tool 1">
+            <img src="precision.jpg" alt="Tool 2">
+            <img src="drill.jpg" alt="Tool 3">
+            <img src="Nut.jpg" alt="Tool 4">
+        </div>
+        <div class="search-container">
+            <input type="text" id="search-bar" placeholder="search">
+            <button class="search-icon-btn" onclick="performSearch()"><i class="fas fa-search"></i></button>
+        </div>
+    </div>
+
+    <main id="product-container" class="container"></main>
+
+    <footer>
+        <a href="mailto:kenkeys10000@gmail.com">
+            <i class="fas fa-headset"></i>
+            <h3>Support & Sales</h3>
+        </a>
+        <p>Available on WhatsApp: +256 743 462 531</p>
+        <p>&copy; 2026 Industrial Hardware Solutions</p>
+    </footer>
+</div>
 
 <script>
+    function showShop() {
+        document.getElementById('landing-page').style.display = 'none';
+        document.getElementById('main-shop').style.display = 'block';
+    }
+
     function toggleNav() {
         const sideNav = document.getElementById("mySidenav");
         sideNav.style.width = sideNav.style.width === "50%" ? "0" : "50%";
     }
 
-    // Close menu when clicking outside
     document.addEventListener('click', function(event) {
         const sideNav = document.getElementById("mySidenav");
         const menuBtn = document.querySelector('.menu-btn');
-        if (!sideNav.contains(event.target) && !menuBtn.contains(event.target)) {
+        if (sideNav.style.width === "50%" && !sideNav.contains(event.target) && !menuBtn.contains(event.target)) {
             sideNav.style.width = "0";
         }
     });
 
-    // Slideshow Logic
     let currentSlide = 0;
     const slides = document.querySelectorAll('#slideshow img');
     function nextSlide() {
@@ -114,7 +135,6 @@
     }
     setInterval(nextSlide, 4000);
 
-    // Inventory Logic
     let inventory = [];
     const whatsappNumber = "256743462531";
 
@@ -123,9 +143,7 @@
             const response = await fetch('products.json');
             inventory = await response.json();
             render(inventory);
-        } catch (e) {
-            console.error("Could not load products.json");
-        }
+        } catch (e) { console.error("Could not load products.json"); }
     }
 
     function render(data) {
@@ -143,14 +161,15 @@
         `).join('');
     }
 
-    document.getElementById('search-bar').addEventListener('keyup', (e) => {
-        const query = e.target.value.toLowerCase();
+    function performSearch() {
+        const query = document.getElementById('search-bar').value.toLowerCase();
         const filtered = inventory.filter(p => 
             p.name.toLowerCase().includes(query) || p.specs.toLowerCase().includes(query)
         );
         render(filtered);
-    });
+    }
 
+    document.getElementById('search-bar').addEventListener('keyup', performSearch);
     loadData();
 </script>
 </body>
