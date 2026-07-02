@@ -6,9 +6,16 @@
     <title>Pro-Grade Industrial Hardware</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --gray: #f4f4f4; }
+        :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --gray: #f4f4f4; --navy: #001f3f; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--gray); color: #333; line-height: 1.4; }
+
+        /* Hamburger Menu Styles */
+        .menu-btn { position: absolute; top: 20px; left: 20px; font-size: 24px; color: var(--gold); cursor: pointer; z-index: 1000; }
+        .side-nav { height: 100%; width: 0; position: fixed; z-index: 2000; top: 0; left: 0; background-color: var(--navy); overflow-x: hidden; transition: 0.5s; padding-top: 60px; }
+        .side-nav a { padding: 15px 25px; text-decoration: none; font-size: 18px; color: var(--gold); display: block; transition: 0.3s; }
+        .side-nav a:hover { color: var(--white); }
+        .side-nav .close-btn { position: absolute; top: 10px; right: 25px; font-size: 36px; cursor: pointer; }
 
         /* Header */
         header { background: var(--onyx); color: var(--gold); padding: 25px 15px; text-align: center; border-bottom: 4px solid var(--gold); }
@@ -23,14 +30,7 @@
         #search-bar { position: relative; z-index: 1; width: 95%; max-width: 500px; padding: 10px; border: 2px solid var(--gold); border-radius: 4px; font-size: 14px; outline: none; background: rgba(255,255,255,0.9); }
 
         /* Product Grid */
-        .container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
-            gap: 10px; 
-            padding: 10px; 
-            max-width: 1200px; 
-            margin: auto; 
-        }
+        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; padding: 10px; max-width: 1200px; margin: auto; }
         .card { background: var(--white); padding: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 3px solid var(--gold); }
         .card img { width: 100%; height: 140px; object-fit: cover; border-radius: 2px; }
         .card h3 { margin: 8px 0; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--onyx); }
@@ -48,6 +48,18 @@
     </style>
 </head>
 <body>
+
+<div class="menu-btn" onclick="toggleNav()"><i class="fas fa-bars"></i></div>
+
+<div id="mySidenav" class="side-nav">
+    <a href="javascript:void(0)" class="close-btn" onclick="toggleNav()">&times;</a>
+    <a href="#">Product Categories</a>
+    <a href="mailto:kenkeys10000@gmail.com">Customer Support</a>
+    <a href="#">Store Location</a>
+    <a href="#">About Us</a>
+    <a href="#">Contact Us</a>
+    <a href="#">FAQ</a>
+</div>
 
 <header>
     <h1><i class="fas fa-tools"></i> PRECISION HARDWARE</h1>
@@ -76,6 +88,20 @@
 </footer>
 
 <script>
+    function toggleNav() {
+        const sideNav = document.getElementById("mySidenav");
+        sideNav.style.width = sideNav.style.width === "25%" ? "0" : "25%";
+    }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const sideNav = document.getElementById("mySidenav");
+        const menuBtn = document.querySelector('.menu-btn');
+        if (!sideNav.contains(event.target) && !menuBtn.contains(event.target)) {
+            sideNav.style.width = "0";
+        }
+    });
+
     // Slideshow Logic
     let currentSlide = 0;
     const slides = document.querySelectorAll('#slideshow img');
