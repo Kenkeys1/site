@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro-Grade Industrial Hardware</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --gray: #f4f4f4; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); color: #333; line-height: 1.6; }
+
+        /* Header */
+        header { background: var(--onyx); color: var(--gold); padding: 40px 20px; text-align: center; border-bottom: 6px solid var(--gold); }
+        header h1 { letter-spacing: 2px; text-transform: uppercase; }
+
+        /* Search & Slideshow */
+        .search-wrap { background: #e0e0e0; padding: 60px 20px; text-align: center; position: relative; overflow: hidden; }
+        .slideshow-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        .slideshow-container img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 1.5s ease-in-out; }
+        .slideshow-container img.active { opacity: 0.7; }
+        
+        #search-bar { position: relative; z-index: 1; width: 90%; max-width: 600px; padding: 15px; border: 2px solid var(--gold); border-radius: 4px; font-size: 16px; outline: none; background: rgba(255,255,255,0.9); }
+
+        /* Product Grid */
+        .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; padding: 40px; max-width: 1200px; margin: auto; }
+        .card { background: var(--white); padding: 20px; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-bottom: 5px solid var(--gold); transition: 0.3s; }
+        .card:hover { transform: translateY(-10px); }
+        .card img { width: 100%; height: 250px; object-fit: cover; border-radius: 3px; }
+        .card h3 { margin: 15px 0; color: var(--onyx); }
+        .price { color: var(--gold); font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; }
+        
+        /* Buttons */
+        .btn-whatsapp { display: block; background: var(--onyx); color: var(--gold); text-align: center; padding: 15px; text-decoration: none; font-weight: bold; border-radius: 4px; border: 1px solid var(--gold); transition: 0.3s; }
+        .btn-whatsapp:hover { background: var(--gold); color: var(--onyx); }
+        
+        /* Footer */
+        footer { background: var(--onyx); color: var(--white); padding: 50px 20px; text-align: center; margin-top: 50px; }
+        footer i { color: var(--gold); font-size: 1.5rem; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1><i class="fas fa-tools"></i> PRECISION HARDWARE</h1>
+    <p>Professional Tools for Heavy Duty Performance</p>
+</header>
+
+<div class="search-wrap">
+    <div class="slideshow-container" id="slideshow">
+        <img src="download1.jpg" class="active" alt="Tool 1">
+        <img src="precision.jpg" alt="Tool 2">
+        <img src="drill.jpg" alt="Tool 3">
+        <img src="Nut.jpg" alt="Tool 4">
+    </div>
+    <input type="text" id="search-bar" placeholder="🔍 Search by tool name or specification...">
+</div>
+
+<main id="product-container" class="container"></main>
+
+<footer>
+    <i class="fas fa-headset"></i>
+    <h3>Support & Sales</h3>
+    <p>Available on WhatsApp: +256 743 462 531</p>
+    <p>&copy; 2026 Industrial Hardware Solutions</p>
+</footer>
+
+<script>
+    // Slideshow Logic
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('#slideshow img');
+    function nextSlide() {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }
+    setInterval(nextSlide, 4000);
+
+    // Inventory Logic
+    let inventory = [];
+    const whatsappNumber = "256743462531";
+
+    async function loadData() {
+        try {
+            const response = await fetch('products.json');
+            inventory = await response.json();
+            render(inventory);
+        } catch (e) {
+            console.error("Could not load products.json");
+        }
+    }
+
+    function render(data) {
+        const container = document.getElementById('product-container');
+        container.innerHTML = data.map(p => `
+            <div class="card">
+                <img src="${p.image}" alt="${p.name}">
+                <h3>${p.name}</h3>
+                <p><i class="fas fa-info-circle"></i> <strong>Specs:</strong> ${p.specs}</p>
+                <p class="price">${p.price}</p>
+                <a href="https://wa.me/${whatsappNumber}?text=Hello, I want to order: ${p.name}" class="btn-whatsapp" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Order via WhatsApp
+                </a>
+            </div>
+        `).join('');
+    }
+
+    document.getElementById('search-bar').addEventListener('keyup', (e) => {
+        const query = e.target.value.toLowerCase();
+        const filtered = inventory.filter(p => 
+            p.name.toLowerCase().includes(query) || p.specs.toLowerCase().includes(query)
+        );
+        render(filtered);
+    });
+
+    loadData();
+</script>
+</body>
+</html>
