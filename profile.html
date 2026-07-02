@@ -6,19 +6,37 @@
     <title>My Profile - Precision Hardware</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --navy: #001f3f; }
+        :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --navy: #001f3f; --orange: #ffa500; }
         body { font-family: 'Segoe UI', sans-serif; background: #0a0909; color: #333; }
         
         .profile-container { max-width: 900px; margin: 40px auto; padding: 20px; }
         .back-link { display: inline-block; margin-bottom: 20px; color: aliceblue; text-decoration: none; font-weight: bold; }
         
         .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .section-card { background: var(--white); padding: 20px; border-radius: 8px; border-left: 5px solid var(--gold); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        /* Card Styles: Uniform height, orange background, and floating effect */
+        .section-card { 
+            background: var(--orange); 
+            padding: 20px; 
+            border-radius: 8px; 
+            border-left: 5px solid var(--gold); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 200px; /* Uniform height for all cards */
+        }
+        .section-card:hover { 
+            transform: translateY(-10px); 
+            box-shadow: 0 15px 20px rgba(0,0,0,0.4); 
+        }
+        
         .section-card h2 { color: var(--navy); margin-bottom: 15px; font-size: 1.2rem; }
         .section-card ul { list-style: none; }
         .section-card li { margin-bottom: 10px; cursor: pointer; padding: 5px; transition: 0.3s; }
-        .section-card li:hover { color: var(--gold); }
+        .section-card li:hover { color: var(--white); }
         
+        /* Making the whole My Account card a link */
+        .card-link { text-decoration: none; display: block; }
+
         header { background: var(--onyx); color: var(--gold); padding: 20px; text-align: center; }
     </style>
 </head>
@@ -29,17 +47,19 @@
 </header>
 
 <div class="profile-container">
-    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Store></a>
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Store</a>
     
     <div class="grid-layout">
-        <div class="section-card">
-            <h2><i class="fas fa-user-cog"></i> My Account</h2>
-            <ul>
-                <li>Profile Information</li>
-                <li>Security & Password</li>
-                <li>Business Profile (B2B)</li>
-            </ul>
-        </div>
+        <a href="profile-edit.html" class="card-link">
+            <div class="section-card">
+                <h2><i class="fas fa-user-cog"></i> My Account</h2>
+                <ul>
+                    <li>Profile Information</li>
+                    <li>Security & Password</li>
+                </ul>
+            </div>
+        </a>
+
         <div class="section-card">
             <h2><i class="fas fa-box-open"></i> Orders</h2>
             <ul>
@@ -48,14 +68,7 @@
                 <li>Track Shipments</li>
             </ul>
         </div>
-        <div class="section-card">
-            <h2><i class="fas fa-file-invoice"></i> Documents</h2>
-            <ul>
-                <li>Invoices & Receipts</li>
-                <li>Quote History</li>
-                <li>Technical Docs / SDS</li>
-            </ul>
-        </div>
+
         <div class="section-card">
             <h2><i class="fas fa-headset"></i> Support</h2>
             <ul>
