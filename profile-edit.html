@@ -59,7 +59,7 @@
     function saveProfile() {
         const profile = {
             username: document.getElementById('username').value,
-            phone: document.getElementById('phone number').value,
+            phone: document.getElementById('phone').value,
             email: document.getElementById('email').value
         };
         localStorage.setItem('userProfile', JSON.stringify(profile));
