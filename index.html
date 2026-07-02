@@ -13,9 +13,9 @@
         /* Hamburger Menu Styles */
         .menu-btn { position: absolute; top: 20px; left: 20px; font-size: 24px; color: var(--gold); cursor: pointer; z-index: 1000; }
         .side-nav { height: 100%; width: 0; position: fixed; z-index: 2000; top: 0; left: 0; background-color: var(--navy); overflow-x: hidden; transition: 0.5s; padding-top: 60px; }
-        .side-nav a { padding: 15px 25px; text-decoration: none; font-size: 18px; color: var(--gold); display: block; transition: 0.3s; }
+        .side-nav a { padding: 12px 15px; text-decoration: none; font-size: 1rem; color: var(--gold); display: block; transition: 0.3s; word-wrap: break-word; }
         .side-nav a:hover { color: var(--white); }
-        .side-nav .close-btn { position: absolute; top: 10px; right: 25px; font-size: 36px; cursor: pointer; }
+        .side-nav .close-btn { position: absolute; top: 10px; right: 15px; font-size: 30px; cursor: pointer; }
 
         /* Header */
         header { background: var(--onyx); color: var(--gold); padding: 25px 15px; text-align: center; border-bottom: 4px solid var(--gold); }
@@ -90,7 +90,7 @@
 <script>
     function toggleNav() {
         const sideNav = document.getElementById("mySidenav");
-        sideNav.style.width = sideNav.style.width === "25%" ? "0" : "25%";
+        sideNav.style.width = sideNav.style.width === "50%" ? "0" : "50%";
     }
 
     // Close menu when clicking outside
