@@ -13,7 +13,11 @@
         /* Welcome Page Styles */
         #landing-page { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: var(--onyx); color: var(--gold); padding: 20px; }
         #landing-page h1 { font-size: 3rem; margin-bottom: 20px; }
-        .btn-shop { background: var(--gold); color: var(--onyx); padding: 15px 40px; font-size: 1.2rem; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; margin-top: 20px; }
+        
+        /* Floating & Highlighted Button Effect */
+        .btn-shop { background: var(--gold); color: var(--onyx); padding: 15px 40px; font-size: 1.2rem; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; margin-top: 20px; transition: transform 0.3s, box-shadow 0.3s, background 0.3s; }
+        .btn-shop:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(212,175,55,0.4); background: var(--white); }
+        
         #main-shop { display: none; }
 
         /* Navigation Styles */
@@ -65,7 +69,7 @@
 
 <div id="main-shop">
     <div class="menu-btn" onclick="toggleNav()"><i class="fas fa-bars"></i></div>
-    <div class="profile-btn"><i class="fas fa-user-circle"></i></div>
+    <a href="profile.html" class="profile-btn"><i class="fas fa-user-circle"></i></a>
 
     <div id="mySidenav" class="side-nav">
         <a href="javascript:void(0)" class="close-btn" onclick="toggleNav()">&times;</a>
@@ -108,10 +112,20 @@
 </div>
 
 <script>
+    // Remember state on reload
     function showShop() {
         document.getElementById('landing-page').style.display = 'none';
         document.getElementById('main-shop').style.display = 'block';
+        localStorage.setItem('hasEnteredShop', 'true');
     }
+
+    // Check if user has already entered
+    window.onload = function() {
+        if (localStorage.getItem('hasEnteredShop') === 'true') {
+            showShop();
+        }
+        loadData();
+    };
 
     function toggleNav() {
         const sideNav = document.getElementById("mySidenav");
@@ -170,7 +184,6 @@
     }
 
     document.getElementById('search-bar').addEventListener('keyup', performSearch);
-    loadData();
 </script>
 </body>
 </html>
