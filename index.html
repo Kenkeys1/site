@@ -22,7 +22,7 @@
         
         #search-bar { position: relative; z-index: 1; width: 95%; max-width: 500px; padding: 10px; border: 2px solid var(--gold); border-radius: 4px; font-size: 14px; outline: none; background: rgba(255,255,255,0.9); }
 
-        /* Product Grid - Optimized for Mobile */
+        /* Product Grid */
         .container { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
@@ -43,7 +43,8 @@
         
         /* Footer */
         footer { background: var(--onyx); color: var(--white); padding: 30px 10px; text-align: center; margin-top: 20px; font-size: 0.75rem; }
-        footer i { color: var(--gold); font-size: 1.2rem; margin-bottom: 5px; }
+        footer a { color: var(--white); text-decoration: none; }
+        footer i { color: var(--gold); font-size: 1.2rem; margin-bottom: 5px; display: block; }
     </style>
 </head>
 <body>
@@ -66,8 +67,10 @@
 <main id="product-container" class="container"></main>
 
 <footer>
-    <i class="fas fa-headset"></i>
-    <h3>Support & Sales</h3>
+    <a href="mailto:kenkeys10000@gmail.com">
+        <i class="fas fa-headset"></i>
+        <h3>Support & Sales</h3>
+    </a>
     <p>Available on WhatsApp: +256 743 462 531</p>
     <p>&copy; 2026 Industrial Hardware Solutions</p>
 </footer>
