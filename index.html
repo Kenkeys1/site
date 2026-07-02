@@ -10,16 +10,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--gold); color: #333; line-height: 1.4; }
 
-        /* Welcome Page Styles */
-        #landing-page { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: var(--onyx); color: var(--gold); padding: 20px; }
-        #landing-page h1 { font-size: 3rem; margin-bottom: 20px; }
-        
-        /* Floating & Highlighted Button Effect */
-        .btn-shop { background: var(--gold); color: var(--onyx); padding: 15px 40px; font-size: 1.2rem; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; margin-top: 20px; transition: transform 0.3s, box-shadow 0.3s, background 0.3s; }
-        .btn-shop:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(212,175,55,0.4); background: var(--white); }
-        
-        #main-shop { display: none; }
-
         /* Navigation Styles */
         .menu-btn { position: absolute; top: 20px; left: 20px; font-size: 24px; color: var(--gold); cursor: pointer; z-index: 1000; }
         .profile-btn { position: absolute; top: 20px; right: 20px; font-size: 24px; color: var(--gold); cursor: pointer; z-index: 1000; }
@@ -38,7 +28,6 @@
         .slideshow-container img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 1.5s ease-in-out; }
         .slideshow-container img.active { opacity: 0.7; }
         
-        /* Updated Search Bar Styles */
         .search-container { position: relative; z-index: 1; width: 95%; max-width: 500px; margin: 0 auto; display: flex; align-items: center; }
         #search-bar { width: 100%; padding: 12px 40px 12px 20px; border: none; border-radius: 50px; font-size: 14px; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .search-icon-btn { position: absolute; right: 15px; cursor: pointer; color: #666; font-size: 18px; border: none; background: transparent; }
@@ -60,12 +49,6 @@
     </style>
 </head>
 <body>
-
-<div id="landing-page">
-    <h1>Welcome to Precision Hardware</h1>
-    <p>Professional Tools for Heavy Duty Performance</p>
-    <button class="btn-shop" onclick="showShop()">Shop Now</button>
-</div>
 
 <div id="main-shop">
     <div class="menu-btn" onclick="toggleNav()"><i class="fas fa-bars"></i></div>
@@ -112,18 +95,7 @@
 </div>
 
 <script>
-    // Remember state on reload
-    function showShop() {
-        document.getElementById('landing-page').style.display = 'none';
-        document.getElementById('main-shop').style.display = 'block';
-        localStorage.setItem('hasEnteredShop', 'true');
-    }
-
-    // Check if user has already entered
     window.onload = function() {
-        if (localStorage.getItem('hasEnteredShop') === 'true') {
-            showShop();
-        }
         loadData();
     };
 
