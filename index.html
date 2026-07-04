@@ -46,6 +46,21 @@
         footer { background: var(--onyx); color: var(--white); padding: 30px 10px; text-align: center; margin-top: 20px; font-size: 0.75rem; }
         footer a { color: var(--white); text-decoration: none; }
         footer i { color: var(--gold); font-size: 1.2rem; margin-bottom: 5px; display: block; }
+
+        /* Contact Popup Styles */
+        .modal-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 3000; 
+            justify-content: center; align-items: center; 
+        }
+        .modal-box { 
+            background: var(--white); width: 90%; max-width: 400px; padding: 25px; 
+            border-radius: 15px; text-align: center; border: 3px solid var(--gold);
+        }
+        .contact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 25px; }
+        .contact-icon { font-size: 22px; color: var(--navy); text-decoration: none; display: flex; flex-direction: column; align-items: center; }
+        .contact-icon span { font-size: 11px; margin-top: 8px; color: var(--onyx); font-weight: bold; }
+        .message-area { width: 100%; height: 100px; margin: 15px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; resize: none; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -60,7 +75,7 @@
         <a href="mailto:kenkeys10000@gmail.com">Customer Support</a>
         <a href="location.html">Store Location</a>
         <a href="about.html">About Us</a>
-        <a href="#">Contact Us</a>
+        <a href="javascript:void(0)" onclick="openContact(); toggleNav();">Contact Us</a>
         <a href="#">FAQ</a>
     </div>
 
@@ -94,10 +109,25 @@
     </footer>
 </div>
 
+<div id="contactModal" class="modal-overlay" onclick="closeContact()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <h3>Contact Us</h3>
+        <textarea id="msgInput" class="message-area" placeholder="Type your message here..."></textarea>
+        <button onclick="sendWhatsAppMessage()" class="btn-whatsapp" style="width:100%; margin-bottom:20px;">
+            <i class="fab fa-whatsapp"></i> Send via WhatsApp
+        </button>
+        
+        <div class="contact-grid">
+            <a href="tel:+256743462531" class="contact-icon"><i class="fas fa-phone"></i><span>Call</span></a>
+            <a href="sms:+256743462531?body=Hello" class="contact-icon"><i class="fas fa-comment-sms"></i><span>SMS</span></a>
+            <a href="mailto:kenkeys10000@gmail.com" class="contact-icon"><i class="fas fa-envelope"></i><span>Email</span></a>
+            <a href="https://wa.me/256743462531?text=Hello" class="contact-icon"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
+        </div>
+    </div>
+</div>
+
 <script>
-    window.onload = function() {
-        loadData();
-    };
+    window.onload = function() { loadData(); };
 
     function toggleNav() {
         const sideNav = document.getElementById("mySidenav");
@@ -112,6 +142,15 @@
         }
     });
 
+    // Contact Popup Functions
+    function openContact() { document.getElementById('contactModal').style.display = 'flex'; }
+    function closeContact() { document.getElementById('contactModal').style.display = 'none'; }
+    function sendWhatsAppMessage() {
+        const msg = document.getElementById('msgInput').value;
+        window.open(`https://wa.me/256743462531?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    // Slideshow
     let currentSlide = 0;
     const slides = document.querySelectorAll('#slideshow img');
     function nextSlide() {
@@ -121,9 +160,9 @@
     }
     setInterval(nextSlide, 4000);
 
+    // Data Loading
     let inventory = [];
     const whatsappNumber = "256743462531";
-
     async function loadData() {
         try {
             const response = await fetch('products.json');
@@ -154,7 +193,6 @@
         );
         render(filtered);
     }
-
     document.getElementById('search-bar').addEventListener('keyup', performSearch);
 </script>
 </body>

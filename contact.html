@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro-Grade Industrial Hardware</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --gray: #f4f4f4; --navy: #001f3f; --purple: #9d00ff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gold); color: #333; line-height: 1.4; transition: 0.3s; }
+        body.blurred { filter: blur(3px); pointer-events: none; }
+
+        /* Navigation Styles */
+        .menu-btn { position: absolute; top: 20px; left: 20px; font-size: 24px; color: var(--gold); cursor: pointer; z-index: 1000; }
+        .profile-btn { position: absolute; top: 20px; right: 20px; font-size: 24px; color: var(--gold); cursor: pointer; z-index: 1000; }
+        .side-nav { height: 100%; width: 0; position: fixed; z-index: 2000; top: 0; left: 0; background-color: var(--navy); overflow-x: hidden; transition: 0.5s; padding-top: 60px; }
+        .side-nav a { padding: 20px 15px; text-decoration: none; font-size: 1rem; color: var(--gold); display: block; transition: 0.3s; border-bottom: 1px solid rgba(255,215,0,0.1); }
+        .side-nav a:hover { color: var(--white); background: rgba(255,255,255,0.05); }
+        .side-nav .close-btn { position: absolute; top: 10px; right: 20px; font-size: 30px; cursor: pointer; color: var(--gold); }
+
+        /* Header & Content */
+        header { background: var(--onyx); color: var(--gold); padding: 25px 15px; text-align: center; border-bottom: 4px solid var(--gold); }
+        .search-wrap { background-color: rgb(83, 92, 92); padding: 30px 10px; text-align: center; position: relative; overflow: hidden; }
+        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; padding: 10px; max-width: 1200px; margin: auto; }
+        .card { background: var(--white); padding: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 3px solid var(--gold); }
+        .btn-whatsapp { display: block; background: var(--onyx); color: var(--gold); text-align: center; padding: 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; text-decoration: none; }
+
+        /* Contact Popup */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000; justify-content: center; align-items: center; }
+        .modal-box { background: var(--white); width: 90%; max-width: 350px; padding: 20px; border-radius: 15px; text-align: center; border: 3px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .message-area { width: 100%; height: 100px; margin: 15px 0; padding: 10px; border: 1px solid #ccc; border-radius: 8px; resize: none; }
+        .contact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
+        .contact-icon { text-decoration: none; display: flex; flex-direction: column; align-items: center; color: var(--navy); font-size: 20px; }
+        .contact-icon span { font-size: 10px; margin-top: 5px; color: var(--onyx); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="main-shop">
+    <div class="menu-btn" onclick="toggleNav()"><i class="fas fa-bars"></i></div>
+    <a href="profile.html" class="profile-btn"><i class="fas fa-user-circle"></i></a>
+
+    <div id="mySidenav" class="side-nav">
+        <a href="javascript:void(0)" class="close-btn" onclick="toggleNav()">&times;</a>
+        <a href="categories.html">Product Categories</a>
+        <a href="location.html">Store Location</a>
+        <a href="about.html">About Us</a>
+        <a href="javascript:void(0)" onclick="openContact(); toggleNav();">Contact Us</a>
+    </div>
+
+    <header>
+        <h1><i class="fas fa-tools"></i> PRECISION HARDWARE</h1>
+    </header>
+
+    <main id="product-container" class="container"></main>
+</div>
+
+<div id="contactModal" class="modal-overlay" onclick="closeContact()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <h3>Message Us</h3>
+        <textarea id="msgInput" class="message-area" placeholder="Type your inquiry..."></textarea>
+        <button onclick="sendWhatsApp()" class="btn-whatsapp" style="width:100%; margin-bottom:20px;">
+            <i class="fab fa-whatsapp"></i> Send to WhatsApp
+        </button>
+        <div class="contact-grid">
+            <a href="tel:+256743462531" class="contact-icon"><i class="fas fa-phone"></i><span>Call</span></a>
+            <a href="sms:+256743462531" class="contact-icon"><i class="fas fa-comment-sms"></i><span>SMS</span></a>
+            <a href="mailto:kenkeys10000@gmail.com" class="contact-icon"><i class="fas fa-envelope"></i><span>Email</span></a>
+            <a href="https://wa.me/256743462531" class="contact-icon"><i class="fab fa-whatsapp"></i><span>Chat</span></a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleNav() {
+        const sideNav = document.getElementById("mySidenav");
+        sideNav.style.width = sideNav.style.width === "50%" ? "0" : "50%";
+    }
+    function openContact() {
+        document.body.classList.add('blurred');
+        document.getElementById('contactModal').style.display = 'flex';
+    }
+    function closeContact() {
+        document.body.classList.remove('blurred');
+        document.getElementById('contactModal').style.display = 'none';
+    }
+    function sendWhatsApp() {
+        const msg = document.getElementById('msgInput').value;
+        window.open(`https://wa.me/256743462531?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+</script>
+</body>
+</html>
