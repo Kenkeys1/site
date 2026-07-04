@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Store Location - Precision Hardware</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --navy: #001f3f; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gold); color: #333; line-height: 1.6; padding-bottom: 20px; }
+
+        header { background: var(--onyx); color: var(--gold); padding: 20px 10px; text-align: center; border-bottom: 4px solid var(--gold); }
+        header h1 { font-size: 1.5rem; }
+        
+        .page-container { width: 95%; max-width: 800px; margin: 15px auto; padding: 15px; background: var(--white); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        
+        /* Mobile-optimized map container */
+        .map-wrapper { width: 100%; height: 300px; border-radius: 8px; overflow: hidden; border: 3px solid var(--navy); margin-bottom: 20px; }
+        
+        .info-card { padding: 15px; background: var(--navy); color: var(--gold); border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; }
+        .info-card h3 { margin-bottom: 10px; font-size: 1.1rem; }
+        
+        .btn-share { display: block; width: 100%; padding: 15px; background: var(--gold); color: var(--onyx); text-align: center; text-decoration: none; font-weight: bold; font-size: 1rem; border-radius: 5px; cursor: pointer; border: none; transition: 0.3s; }
+        .btn-share:active { transform: scale(0.98); }
+        
+        .back-link { display: inline-block; margin-bottom: 15px; color: var(--onyx); text-decoration: none; font-weight: bold; font-size: 0.9rem; }
+
+        footer { background: var(--onyx); color: var(--white); padding: 30px 10px; text-align: center; margin-top: 20px; font-size: 0.75rem; }
+        footer a { color: var(--white); text-decoration: none; }
+        footer i { color: var(--gold); font-size: 1.2rem; margin-bottom: 5px; display: block; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1><i class="fas fa-map-marked-alt"></i> STORE LOCATION</h1>
+</header>
+
+<div class="page-container">
+    
+    
+    <div class="map-wrapper">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15959.043217436034!2d32.5804!3d0.3476!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x177db2998a445091%3A0x673998b5840d576!2sKampala!5e0!3m2!1sen!2sug!4v1690000000000!5m2!1sen!2sug" 
+        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+
+    <div class="info-card">
+        <h3><i class="fas fa-store"></i> Precision Hardware Headquarters</h3>
+        <p><i class="fas fa-map-marker-alt"></i> <strong>Address:</strong> Industrial Area, Main Hardware Street, Kampala, Uganda</p>
+        <p><i class="fas fa-clock"></i> <strong>Working Hours:</strong> Mon - Sun | 7:00 AM - 7:00 PM</p>
+    </div>
+
+    <button class="btn-share" onclick="shareLocation()">
+        <i class="fas fa-share-alt"></i> Share Store Location
+    </button>
+
+    <footer>
+        <a href="mailto:kenkeys10000@gmail.com">
+            <i class="fas fa-headset"></i>
+            <h3>Support & Sales</h3>
+        </a>
+        <p>Available on WhatsApp: +256 743 462 531</p>
+        <p>&copy; 2026 Industrial Hardware Solutions</p>
+    </footer>
+</div>
+
+<script>
+    function shareLocation() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Precision Hardware Location',
+                text: 'Visit us at Industrial Area for all your hardware needs!',
+                url: window.location.href
+            }).catch(console.error);
+        } else {
+            alert("Share feature not supported on this browser. Copy the URL to share!");
+        }
+    }
+</script>
+
+</body>
+</html>
