@@ -2,30 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Precision Hardware - User Profile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
     <style>
         :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --navy: #001f3f; --orange: #ffa500; }
-        body { font-family: 'Segoe UI', sans-serif; background: #0a0909; color: #fff; margin: 0; }
-        header { background: var(--onyx); color: var(--gold); padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); }
-        .container { max-width: 500px; margin: 30px auto; padding: 25px; background: #161616; border-radius: 15px; box-shadow: 0 0 15px rgba(212,175,55,0.2); }
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0909; color: #fff; margin: 0; padding: 10px; }
+        header { background: var(--onyx); color: var(--gold); padding: 15px; text-align: center; border-bottom: 2px solid var(--gold); margin-bottom: 20px; }
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; background: #161616; border-radius: 15px; box-shadow: 0 0 15px rgba(212,175,55,0.2); }
         
-        .profile-wrapper { position: relative; width: 150px; margin: 0 auto 20px; }
-        #profile-pic { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--gold); display: block; cursor: pointer; }
-        .avatar-initial { width: 150px; height: 150px; border-radius: 50%; background: var(--gold); color: var(--onyx); display: flex; align-items: center; justify-content: center; font-size: 5rem; font-weight: bold; border: 4px solid var(--gold); cursor: pointer; }
-        .delete-btn { position: absolute; bottom: 5px; right: 5px; background: red; color: white; border-radius: 50%; width: 30px; height: 30px; border: none; cursor: pointer; display: none; }
+        .profile-wrapper { position: relative; width: 120px; margin: 0 auto 20px; }
+        #profile-pic { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid var(--gold); display: block; cursor: pointer; }
+        .avatar-initial { width: 120px; height: 120px; border-radius: 50%; background: var(--gold); color: var(--onyx); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; border: 4px solid var(--gold); cursor: pointer; }
+        .delete-btn { position: absolute; bottom: 0; right: 0; background: #ff4444; color: white; border-radius: 50%; width: 35px; height: 35px; border: none; cursor: pointer; display: none; }
         
-        .input-group { margin-bottom: 20px; position: relative; }
-        label { display: block; margin-bottom: 5px; color: var(--gold); font-size: 0.9rem; }
-        input { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #444; background: #222; color: white; box-sizing: border-box; padding-right: 40px; }
-        .toggle-btn { position: absolute; right: 15px; top: 38px; cursor: pointer; color: #888; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; background: var(--gold); color: #000; font-weight: bold; margin-top: 10px; }
+        .input-group { margin-bottom: 18px; position: relative; }
+        label { display: block; margin-bottom: 8px; color: var(--gold); font-size: 0.85rem; }
+        input { width: 100%; padding: 14px; border-radius: 8px; border: 1px solid #444; background: #222; color: white; box-sizing: border-box; font-size: 16px; /* 16px prevents zoom on iOS */ }
         
-        #cropper-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; padding: 20px; box-sizing: border-box; }
-        #crop-container { height: 80vh; width: 100%; margin-bottom: 10px; }
+        /* Fixed eye icon positioning */
+        .toggle-btn { position: absolute; right: 15px; top: 40px; cursor: pointer; color: #aaa; padding: 5px; z-index: 10; }
+        
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; cursor: pointer; background: var(--gold); color: #000; font-weight: bold; margin-top: 15px; font-size: 1rem; }
+        
+        #cropper-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; padding: 20px; box-sizing: border-box; }
+        #crop-container { height: 70vh; width: 100%; margin-bottom: 10px; }
         .iti { width: 100%; }
     </style>
 </head>
@@ -54,7 +57,7 @@
         <input type="tel" id="phone">
     </div>
     <div class="input-group">
-        <label>Current Password (Enter only if changing password)</label>
+        <label>Current Password</label>
         <input type="password" id="current-pass">
         <i class="fas fa-eye toggle-btn" onclick="togglePass('current-pass')"></i>
     </div>
@@ -64,7 +67,7 @@
         <i class="fas fa-eye toggle-btn" onclick="togglePass('new-pass')"></i>
     </div>
     <button class="btn" onclick="saveProfile()">Save All Changes</button>
-    <p style="text-align: center; margin-top: 15px; color: #888; cursor: pointer;" onclick="forgotPassword()">Forgot Password?</p>
+    <p style="text-align: center; margin-top: 20px; color: #888; cursor: pointer; padding: 10px;" onclick="forgotPassword()">Forgot Password?</p>
 </div>
 
 <div id="cropper-modal">
@@ -79,8 +82,7 @@
     let cropper;
 
     window.onload = () => {
-        const name = localStorage.getItem('username') || 'User';
-        document.getElementById('edit-name').value = name;
+        document.getElementById('edit-name').value = localStorage.getItem('username') || '';
         document.getElementById('edit-email').value = localStorage.getItem('email') || '';
         document.getElementById('phone').value = localStorage.getItem('phone') || '';
         updateAvatarDisplay(localStorage.getItem('avatar'));
@@ -94,7 +96,8 @@
             pic.src = avatar; pic.style.display = 'block';
             init.style.display = 'none'; del.style.display = 'block';
         } else {
-            init.innerText = (document.getElementById('edit-name').value || 'U').charAt(0).toUpperCase();
+            const name = document.getElementById('edit-name').value || 'U';
+            init.innerText = name.charAt(0).toUpperCase();
             init.style.display = 'flex'; pic.style.display = 'none'; del.style.display = 'none';
         }
     }
@@ -129,7 +132,14 @@
 
     function togglePass(id) {
         const x = document.getElementById(id);
-        x.type = (x.type === "password") ? "text" : "password";
+        const icon = x.nextElementSibling;
+        if (x.type === "password") {
+            x.type = "text";
+            icon.classList.replace("fa-eye", "fa-eye-slash");
+        } else {
+            x.type = "password";
+            icon.classList.replace("fa-eye-slash", "fa-eye");
+        }
     }
 
     function saveProfile() {
@@ -137,7 +147,6 @@
         const newPass = document.getElementById('new-pass').value;
         const storedPass = localStorage.getItem('password');
 
-        // Only enforce password check if the user is attempting to set a new password
         if (newPass !== "") {
             if (storedPass && currentPassInput !== storedPass) {
                 alert("Incorrect current password!");
@@ -146,7 +155,6 @@
             localStorage.setItem('password', newPass);
         }
 
-        // Save general info
         localStorage.setItem('username', document.getElementById('edit-name').value);
         localStorage.setItem('email', document.getElementById('edit-email').value);
         localStorage.setItem('phone', iti.getNumber());

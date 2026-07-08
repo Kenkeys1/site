@@ -34,7 +34,9 @@
         input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         .iti { width: 100%; } 
         .btn-auth { width: 100%; padding: 12px; background: var(--navy); color: var(--gold); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .toggle-password { cursor: pointer; position: absolute; right: 10px; top: 12px; color: #666; }
+        
+        /* Fixed Toggle Position */
+        .toggle-password { cursor: pointer; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; z-index: 10; }
         
         /* Logout Button */
         #logout-btn { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background: var(--gold); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
@@ -77,7 +79,7 @@
             <div class="input-group"><input type="text" id="user-field" placeholder="Email or Username" required></div>
             <div class="input-group">
                 <input type="password" id="pass1" placeholder="Password" required>
-                <i class="fas fa-eye toggle-password" onclick="togglePass('pass1')"></i>
+                <i class="fas fa-eye toggle-password" onclick="togglePass('pass1', this)"></i>
             </div>
             <button class="btn-auth" onclick="validateAndFinish()">Finish</button>
         </form>
@@ -103,9 +105,17 @@
         location.reload();
     }
 
-    function togglePass(id) {
+    function togglePass(id, icon) {
         const x = document.getElementById(id);
-        x.type = (x.type === "password") ? "text" : "password";
+        if (x.type === "password") {
+            x.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            x.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
     }
 
     function validateAndFinish() {
@@ -142,11 +152,11 @@
             <input type="tel" id="phone" style="margin-bottom:10px" required>
             <div class="input-group">
                 <input type="password" id="p1" placeholder="Password" required>
-                <i class="fas fa-eye toggle-password" onclick="togglePass('p1')"></i>
+                <i class="fas fa-eye toggle-password" onclick="togglePass('p1', this)"></i>
             </div>
             <div class="input-group">
                 <input type="password" id="p2" placeholder="Confirm Password" required>
-                <i class="fas fa-eye toggle-password" onclick="togglePass('p2')"></i>
+                <i class="fas fa-eye toggle-password" onclick="togglePass('p2', this)"></i>
             </div>
             <button class="btn-auth" onclick="validateAndFinish()">Finish Sign Up</button>
             <p style="text-align: center; margin-top: 10px; cursor: pointer;" onclick="location.reload()">Already have an account? Sign In</p>
