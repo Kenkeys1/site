@@ -172,19 +172,21 @@
     }
 
     function render(data) {
-        const container = document.getElementById('product-container');
-        container.innerHTML = data.map(p => `
-            <div class="card">
+    const container = document.getElementById('product-container');
+    container.innerHTML = data.map(p => `
+        <div class="card" style="cursor: pointer;">
+            <a href="product-detail.html?id=${p.id}" style="text-decoration: none; color: inherit;">
                 <img src="${p.image}" alt="${p.name}">
                 <h3>${p.name}</h3>
                 <p><i class="fas fa-info-circle"></i> <strong>Specs:</strong> ${p.specs}</p>
                 <p class="price">${p.price}</p>
-                <a href="https://wa.me/${whatsappNumber}?text=Hello, I want to order: ${p.name}" class="btn-whatsapp" target="_blank">
-                    <i class="fab fa-whatsapp"></i> Order via WhatsApp
-                </a>
-            </div>
-        `).join('');
-    }
+            </a>
+            <a href="https://wa.me/${whatsappNumber}?text=Hello, I want to order: ${p.name}" class="btn-whatsapp" target="_blank">
+                <i class="fab fa-whatsapp"></i> Order via WhatsApp
+            </a>
+        </div>
+    `).join('');
+}
 
     function performSearch() {
         const query = document.getElementById('search-bar').value.toLowerCase();

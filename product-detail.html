@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Precision Hardware</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --gray: #f4f4f4; --navy: #001f3f; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gold); color: #333; }
+
+        /* Shared Header/Footer Styles */
+        header { background: var(--onyx); color: var(--gold); padding: 25px 15px; text-align: center; border-bottom: 4px solid var(--gold); }
+        .back-btn { display: inline-block; padding: 10px 20px; background: var(--onyx); color: var(--gold); text-decoration: none; font-weight: bold; margin: 20px; border-radius: 5px; border: 1px solid var(--gold); }
+        
+        footer { background: var(--onyx); color: var(--white); padding: 30px 10px; text-align: center; margin-top: 20px; font-size: 0.75rem; }
+        footer a { color: var(--white); text-decoration: none; }
+        footer i { color: var(--gold); font-size: 1.2rem; margin-bottom: 5px; display: block; }
+
+        /* Detail Wrapper Styles */
+        .details-wrapper { max-width: 1000px; margin: 20px auto; padding: 30px; background: var(--white); display: flex; flex-wrap: wrap; gap: 40px; border-radius: 10px; border-bottom: 5px solid var(--gold); }
+        .left-col { flex: 1; min-width: 300px; }
+        .big-img { width: 100%; height: 400px; object-fit: contain; background: #eee; border-radius: 5px; }
+        .gallery { display: flex; gap: 10px; margin-top: 15px; }
+        .thumb { width: 70px; height: 70px; object-fit: cover; cursor: pointer; border: 2px solid var(--gold); }
+        .right-col { flex: 1; min-width: 300px; display: flex; flex-direction: column; justify-content: center; }
+        .price { font-size: 2rem; color: var(--gold); font-weight: bold; margin-bottom: 20px; }
+
+        /* Homepage Card Styles (Copied Exactly) */
+        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; padding: 10px; max-width: 1200px; margin: auto; }
+        .card { background: var(--white); padding: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 3px solid var(--gold); }
+        .card img { width: 100%; height: 140px; object-fit: cover; border-radius: 2px; }
+        .card h3 { margin: 8px 0; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--onyx); }
+        .btn-whatsapp { display: block; background: var(--onyx); color: var(--gold); text-align: center; padding: 8px; text-decoration: none; font-size: 0.8rem; font-weight: bold; border-radius: 4px; border: 1px solid var(--gold); transition: 0.3s; }
+        .btn-whatsapp:hover { background: var(--gold); color: var(--onyx); }
+    </style>
+</head>
+<body>
+
+    <header><h1><i class="fas fa-tools"></i> PRECISION HARDWARE</h1></header>
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Shop</a>
+
+    <div class="details-wrapper">
+        <div class="left-col">
+            <img id="big-img" class="big-img" src="" alt="Product">
+            <div id="gallery" class="gallery"></div>
+        </div>
+        <div class="right-col">
+            <h1 id="p-name">Loading...</h1>
+            <p id="p-desc" style="margin-bottom: 20px;"></p>
+            <div class="price" id="p-price"></div>
+            <a id="order-link" class="btn-whatsapp" style="padding:15px; font-size:1.1rem;" href="#" target="_blank">
+                <i class="fab fa-whatsapp"></i> Order via WhatsApp
+            </a>
+        </div>
+    </div>
+
+    <h2 style="text-align:center; color:var(--onyx); margin-top:40px;">More Products</h2>
+    <main id="product-container" class="container"></main>
+
+    <footer>
+        <a href="mailto:kenkeys10000@gmail.com">
+            <i class="fas fa-headset"></i>
+            <h3>Support & Sales</h3>
+        </a>
+        <p>Available on WhatsApp: +256 743 462 531</p>
+        <p>&copy; 2026 Industrial Hardware Solutions</p>
+    </footer>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        const whatsappNumber = "256743462531";
+
+        fetch('products.json')
+            .then(res => res.json())
+            .then(data => {
+                const p = data.find(item => item.id == id);
+                if (p) {
+                    document.getElementById('p-name').innerText = p.name;
+                    document.getElementById('p-desc').innerText = p.specs;
+                    document.getElementById('p-price').innerText = p.price;
+                    document.getElementById('big-img').src = p.image;
+                    document.getElementById('order-link').href = `https://wa.me/${whatsappNumber}?text=Hello, I want to order: ${p.name}`;
+                    
+                    if(p.gallery) {
+                        p.gallery.forEach(imgUrl => {
+                            const img = document.createElement('img');
+                            img.src = imgUrl; img.className = 'thumb';
+                            img.onclick = () => document.getElementById('big-img').src = imgUrl;
+                            document.getElementById('gallery').appendChild(img);
+                        });
+                    }
+                }
+
+                const container = document.getElementById('product-container');
+                container.innerHTML = data.map(prod => `
+                    <div class="card">
+                        <a href="product-detail.html?id=${prod.id}" style="text-decoration:none; color:inherit;">
+                            <img src="${prod.image}" alt="${prod.name}">
+                            <h3>${prod.name}</h3>
+                            <p style="font-size:0.75rem; margin-bottom:5px;"><i class="fas fa-info-circle"></i> ${prod.specs}</p>
+                            <p class="price" style="font-size:1.1rem;">${prod.price}</p>
+                        </a>
+                        <a href="https://wa.me/${whatsappNumber}?text=Hello, I want to order: ${prod.name}" class="btn-whatsapp" target="_blank">
+                            <i class="fab fa-whatsapp"></i> Order via WhatsApp
+                        </a>
+                    </div>
+                `).join('');
+            });
+    </script>
+</body>
+</html>
