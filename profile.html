@@ -5,80 +5,154 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - Precision Hardware</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
     <style>
         :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --navy: #001f3f; --orange: #ffa500; }
-        body { font-family: 'Segoe UI', sans-serif; background: #0a0909; color: #333; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0909; color: #333; margin: 0; }
         
-        .profile-container { max-width: 900px; margin: 40px auto; padding: 20px; }
-        .back-link { display: inline-block; margin-bottom: 20px; color: aliceblue; text-decoration: none; font-weight: bold; }
+        /* Profile Layout */
+        .profile-container { max-width: 900px; margin: 20px auto; padding: 10px; filter: blur(5px); pointer-events: none; }
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
         
-        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        /* Floating Card Styles */
+        .card-link { text-decoration: none; display: block; transition: transform 0.3s ease; }
+        .card-link:hover { transform: translateY(-10px); }
+        .section-card { background: var(--orange); padding: 15px; border-radius: 8px; border-left: 5px solid var(--gold); height: 160px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .section-card h2 { color: var(--navy); margin-bottom: 10px; font-size: 1.1rem; }
+        .section-card ul { list-style: none; padding-left: 0; }
         
-        /* Card Styles: Uniform height, orange background, and floating effect */
-        .section-card { 
-            background: var(--orange); 
-            padding: 20px; 
-            border-radius: 8px; 
-            border-left: 5px solid var(--gold); 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 200px; /* Uniform height for all cards */
-        }
-        .section-card:hover { 
-            transform: translateY(-10px); 
-            box-shadow: 0 15px 20px rgba(0,0,0,0.4); 
-        }
+        /* Interactive List Items */
+        .section-card li { color: #0a0909; margin-bottom: 5px; font-size: 0.9rem; padding: 5px; cursor: pointer; transition: 0.3s; }
+        .section-card li:hover { color: var(--white); background: rgba(0,0,0,0.1); border-radius: 4px; }
         
-        .section-card h2 { color: var(--navy); margin-bottom: 15px; font-size: 1.2rem; }
-        .section-card ul { list-style: none; }
-        .section-card li {color: #0a0909;}
-        .section-card li { margin-bottom: 10px; cursor: pointer; padding: 5px; transition: 0.3s; }
-        .section-card li:hover { color: var(--white); }
-        
-        /* Making the whole My Account card a link */
-        .card-link { text-decoration: none; display: block; }
-
         header { background: var(--onyx); color: var(--gold); padding: 20px; text-align: center; }
+
+        /* Auth Modal */
+        #auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .modal-box { background: var(--white); padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 0 20px var(--gold); }
+        .input-group { margin-bottom: 15px; width: 100%; position: relative; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .iti { width: 100%; } 
+        .btn-auth { width: 100%; padding: 12px; background: var(--navy); color: var(--gold); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .toggle-password { cursor: pointer; position: absolute; right: 10px; top: 12px; color: #666; }
+        
+        /* Logout Button */
+        #logout-btn { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background: var(--gold); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1><i class="fas fa-user-circle"></i> ACCOUNT DASHBOARD</h1>
-</header>
+<header><h1><i class="fas fa-user-circle"></i> ACCOUNT DASHBOARD</h1></header>
 
-<div class="profile-container">
-    
+<div class="profile-container" id="profile-content">
     <div class="grid-layout">
-        <a href="profile-edit.html" class="card-link">
+        <a href="#" class="card-link" onclick="alert('Opening Account Settings...')">
             <div class="section-card">
                 <h2><i class="fas fa-user-cog"></i> My Account</h2>
                 <ul>
-                    <li>Profile Information</li>
-                    <li>Security & Password</li>
+                    <li onclick="event.stopPropagation(); alert('Profile Info')">Profile Information</li>
+                    <li onclick="event.stopPropagation(); alert('Security')">Security & Password</li>
                 </ul>
             </div>
         </a>
-
-        <div class="section-card">
-            <h2><i class="fas fa-box-open"></i> Orders</h2>
-            <ul>
-                <li>Order History</li>
-                <li>Quick Reorder</li>
-                <li>Track Shipments</li>
-            </ul>
-        </div>
-
-        <div class="section-card">
-            <h2><i class="fas fa-headset"></i> Support</h2>
-            <ul>
-                <li>Contact Account Manager</li>
-                <li>Open Support Ticket</li>
-                <li>Warranty & Returns</li>
-            </ul>
-        </div>
+        <a href="#" class="card-link" onclick="alert('Opening Orders...')">
+            <div class="section-card">
+                <h2><i class="fas fa-box-open"></i> Orders</h2>
+                <ul>
+                    <li onclick="event.stopPropagation(); alert('Order History')">Order History</li>
+                    <li onclick="event.stopPropagation(); alert('Reorder')">Quick Reorder</li>
+                    <li onclick="event.stopPropagation(); alert('Tracking')">Track Shipments</li>
+                </ul>
+            </div>
+        </a>
     </div>
 </div>
 
+<button id="logout-btn" onclick="logout()">Logout</button>
+
+<div id="auth-modal">
+    <div class="modal-box" id="login-box">
+        <h2 id="modal-title">Sign In</h2>
+        <form id="auth-form" onsubmit="return false;">
+            <div class="input-group"><input type="text" id="user-field" placeholder="Email or Username" required></div>
+            <div class="input-group">
+                <input type="password" id="pass1" placeholder="Password" required>
+                <i class="fas fa-eye toggle-password" onclick="togglePass('pass1')"></i>
+            </div>
+            <button class="btn-auth" onclick="validateAndFinish()">Finish</button>
+        </form>
+        <p style="text-align: center; margin-top: 10px; font-size: 0.85rem;">
+            <span style="color: blue; cursor: pointer;" onclick="forgotPassword()">Forgot Password?</span>
+        </p>
+        <p style="text-align: center; margin-top: 10px; cursor: pointer;" onclick="switchToSignup()">Don't have an account? Sign Up</p>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+<script>
+    window.onload = function() {
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            document.getElementById('auth-modal').style.display = 'none';
+            document.getElementById('profile-content').style.filter = 'none';
+            document.getElementById('profile-content').style.pointerEvents = 'auto';
+        }
+    };
+
+    function logout() {
+        localStorage.removeItem('isLoggedIn');
+        location.reload();
+    }
+
+    function togglePass(id) {
+        const x = document.getElementById(id);
+        x.type = (x.type === "password") ? "text" : "password";
+    }
+
+    function validateAndFinish() {
+        const inputs = document.querySelectorAll('#login-box input');
+        for (let input of inputs) {
+            if (input.value.trim() === "") {
+                input.focus();
+                alert("Please fill in all fields.");
+                return;
+            }
+        }
+        const p1 = document.getElementById('p1');
+        const p2 = document.getElementById('p2');
+        if (p1 && p2 && p1.value !== p2.value) {
+            alert("Passwords do not match!");
+            return;
+        }
+        localStorage.setItem('isLoggedIn', 'true');
+        document.getElementById('auth-modal').style.display = 'none';
+        document.getElementById('profile-content').style.filter = 'none';
+        document.getElementById('profile-content').style.pointerEvents = 'auto';
+    }
+
+    function forgotPassword() {
+        const contact = prompt("Enter your registered Email or Phone Number:");
+        if (contact) alert("A reset code has been sent to " + contact);
+    }
+
+    function switchToSignup() {
+        document.getElementById('modal-title').innerText = "Create Account";
+        document.getElementById('login-box').innerHTML = `
+            <input type="text" placeholder="Username" id="user-field" style="margin-bottom:10px" required>
+            <input type="email" placeholder="Email" id="email-field" style="margin-bottom:10px" required>
+            <input type="tel" id="phone" style="margin-bottom:10px" required>
+            <div class="input-group">
+                <input type="password" id="p1" placeholder="Password" required>
+                <i class="fas fa-eye toggle-password" onclick="togglePass('p1')"></i>
+            </div>
+            <div class="input-group">
+                <input type="password" id="p2" placeholder="Confirm Password" required>
+                <i class="fas fa-eye toggle-password" onclick="togglePass('p2')"></i>
+            </div>
+            <button class="btn-auth" onclick="validateAndFinish()">Finish Sign Up</button>
+            <p style="text-align: center; margin-top: 10px; cursor: pointer;" onclick="location.reload()">Already have an account? Sign In</p>
+        `;
+        intlTelInput(document.querySelector("#phone"), { initialCountry: "ug" });
+    }
+</script>
 </body>
 </html>

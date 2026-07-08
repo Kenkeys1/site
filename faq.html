@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ | Pro-Grade Industrial Hardware</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; color: #333; margin: 0; padding: 20px; }
+        
+        header { text-align: center; margin-bottom: 30px; color: var(--onyx); }
+        .faq-container { max-width: 600px; margin: 0 auto; }
+
+        /* Accordion Styles */
+        .faq-item { background: var(--white); margin-bottom: 10px; border-radius: 8px; border-left: 5px solid var(--gold); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .question { padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .answer { padding: 0 20px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease; color: #555; font-size: 0.9rem; }
+        
+        .active-q .answer { padding: 0 20px 20px 20px; max-height: 200px; }
+        .active-q .question i { transform: rotate(180deg); }
+
+        .back-btn { display: block; text-align: center; margin-top: 30px; color: var(--onyx); text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1><i class="fas fa-question-circle"></i> Frequently Asked Questions</h1>
+</header>
+
+<div class="faq-container">
+    <div class="faq-item">
+        <div class="question" onclick="toggleAnswer(this)">
+            How can I place an order? <span><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="answer">
+            You can order by clicking the "Order via WhatsApp" button on any product card. This will open a direct chat with our sales team with your selected item pre-filled.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="question" onclick="toggleAnswer(this)">
+            Do you offer delivery services? <span><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="answer">
+            Yes, we offer reliable delivery within Kampala and surrounding areas. Contact us via WhatsApp to arrange delivery for your specific order.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="question" onclick="toggleAnswer(this)">
+            What is your return policy? <span><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="answer">
+            We accept returns on defective hardware within 7 days of purchase. Please ensure you have your receipt or order confirmation handy when reaching out to support.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="question" onclick="toggleAnswer(this)">
+            Are these tools covered by a warranty? <span><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="answer">
+            Most of our professional-grade tools come with a manufacturer's warranty. Specific details vary by brand; please check the product description or ask our team.
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function toggleAnswer(element) {
+        // Toggle the active class on the parent
+        const parent = element.parentElement;
+        parent.classList.toggle('active-q');
+        
+        // Close other open answers (optional, remove if you want multiple open)
+        document.querySelectorAll('.faq-item').forEach(item => {
+            if (item !== parent) item.classList.remove('active-q');
+        });
+    }
+</script>
+
+</body>
+</html>
