@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 20px; }
+        .form-box { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { border: 1px solid #ddd; padding: 12px; }
+        .btn { padding: 8px 15px; cursor: pointer; }
+        /* Style for the UGX label */
+        .price-tag { font-weight: bold; color: #333; margin-right: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="form-box">
+    <h3 id="form-title">Add New Product</h3>
+    <input type="hidden" id="edit-id">
+    <input type="text" id="name" placeholder="Name">
+    <textarea id="specs" placeholder="Description"></textarea>
+    <input type="text" id="price" placeholder="Price (e.g. 50000)">
+    <select id="category">
+        <option>Power Tools</option><option>Hand Tools</option>
+        <option>Fasteners</option><option>Plumbing</option>
+        <option>Electrical</option><option>Measuring Tools</option><option>Lubricants</option>
+    </select>
+    <input type="file" id="image">
+    <button class="btn" onclick="saveProduct()">Save Product</button>
+    <button class="btn" onclick="resetForm()">Cancel</button>
+</div>
+
+<table>
+    <thead><tr><th>Image</th><th>Name</th><th>Specs</th><th>Price</th><th>Category</th><th>Action</th></tr></thead>
+    <tbody id="product-list"></tbody>
+</table>
+
+<script>
+    async function saveProduct() {
+        const id = document.getElementById('edit-id').value;
+        const formData = new FormData();
+        
+        if (id) formData.append('id', id);
+        
+        formData.append('name', document.getElementById('name').value);
+        formData.append('specs', document.getElementById('specs').value);
+        // Save the raw number only
+        formData.append('price', document.getElementById('price').value.replace('UGX ', ''));
+        formData.append('category', document.getElementById('category').value);
+        
+        const imageFile = document.getElementById('image').files[0];
+        if (imageFile) formData.append('image', imageFile);
+
+        const url = id ? 'http://localhost:3000/api/products/edit' : 'http://localhost:3000/api/products/add';
+        
+        await fetch(url, { method: 'POST', body: formData });
+        resetForm();
+        loadInventory();
+    }
+
+    async function loadInventory() {
+        const res = await fetch('http://localhost:3000/api/products');
+        const data = await res.json();
+        const list = document.getElementById('product-list');
+        list.innerHTML = data.map(p => `
+            <tr>
+                <td><img src="http://localhost:3000${p.image}" width="50"></td>
+                <td>${p.name}</td>
+                <td>${p.specs}</td>
+                <td><span class="price-tag">UGX</span> ${p.price}</td>
+                <td>${p.category}</td>
+                <td>
+                    <button class="btn" onclick='editProduct(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Edit</button>
+                    <button class="btn" onclick="deleteProduct('${p.id}')">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function editProduct(p) {
+        document.getElementById('edit-id').value = p.id;
+        document.getElementById('name').value = p.name;
+        document.getElementById('specs').value = p.specs;
+        // Strip the UGX if it exists for clean editing
+        document.getElementById('price').value = p.price.toString().replace('UGX ', '');
+        document.getElementById('category').value = p.category;
+        document.getElementById('form-title').innerText = "Edit Product";
+    }
+
+    function resetForm() {
+        document.getElementById('edit-id').value = '';
+        document.getElementById('name').value = '';
+        document.getElementById('specs').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('form-title').innerText = "Add New Product";
+    }
+
+    async function deleteProduct(id) {
+        if(confirm('Delete this product?')) {
+            await fetch(`http://localhost:3000/api/products/${id}`, { method: 'DELETE' });
+            loadInventory();
+        }
+    }
+
+    loadInventory();
+</script>
+</body>
+</html>

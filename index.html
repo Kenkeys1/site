@@ -32,9 +32,15 @@
         #search-bar { width: 100%; padding: 12px 40px 12px 20px; border: none; border-radius: 50px; font-size: 14px; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .search-icon-btn { position: absolute; right: 15px; cursor: pointer; color: #666; font-size: 18px; border: none; background: transparent; }
 
+        /* Category Filter */
+        .category-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 20px; background: var(--navy); }
+        .cat-btn { padding: 10px 15px; border-radius: 20px; border: 1px solid var(--gold); background: transparent; color: var(--gold); cursor: pointer; font-size: 0.85rem; transition: 0.3s; }
+        .cat-btn:hover, .cat-btn.active { background: var(--gold); color: var(--onyx); }
+
         /* Product Grid */
         .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; padding: 10px; max-width: 1200px; margin: auto; }
-        .card { background: var(--white); padding: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 3px solid var(--gold); }
+        .card { background: var(--white); padding: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 3px solid var(--gold); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         .card img { width: 100%; height: 140px; object-fit: cover; border-radius: 2px; }
         .card h3 { margin: 8px 0; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--onyx); }
         .price { color: var(--gold); font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; }
@@ -93,9 +99,11 @@
         </div>
         <div class="search-container">
             <input type="text" id="search-bar" placeholder="search">
-            <button class="search-icon-btn" onclick="performSearch()"><i class="fas fa-search"></i></button>
+            <button class="search-icon-btn" onclick="filterProducts('All')"><i class="fas fa-search"></i></button>
         </div>
     </div>
+
+    <div class="category-nav" id="category-nav"></div>
 
     <main id="product-container" class="container"></main>
 
@@ -142,7 +150,6 @@
         }
     });
 
-    // Contact Popup Functions
     function openContact() { document.getElementById('contactModal').style.display = 'flex'; }
     function closeContact() { document.getElementById('contactModal').style.display = 'none'; }
     function sendWhatsAppMessage() {
@@ -150,7 +157,6 @@
         window.open(`https://wa.me/256743462531?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // Slideshow
     let currentSlide = 0;
     const slides = document.querySelectorAll('#slideshow img');
     function nextSlide() {
@@ -160,42 +166,55 @@
     }
     setInterval(nextSlide, 4000);
 
-    // Data Loading
     let inventory = [];
     const whatsappNumber = "256743462531";
-    async function loadData() {
-        try {
-            const response = await fetch('products.json');
-            inventory = await response.json();
-            render(inventory);
-        } catch (e) { console.error("Could not load products.json"); }
-    }
+    const categories = ['All', 'Power Tools', 'Hand Tools', 'Fasteners', 'Safety Gear', 'Plumbing', 'Electrical', 'Measuring Tools', 'Lubricants'];
 
-    function render(data) {
-    const container = document.getElementById('product-container');
-    container.innerHTML = data.map(p => `
-        <div class="card" style="cursor: pointer;">
-            <a href="product-detail.html?id=${p.id}" style="text-decoration: none; color: inherit;">
-                <img src="${p.image}" alt="${p.name}">
-                <h3>${p.name}</h3>
-                <p><i class="fas fa-info-circle"></i> <strong>Specs:</strong> ${p.specs}</p>
-                <p class="price">${p.price}</p>
-            </a>
-            <a href="https://wa.me/${whatsappNumber}?text=Hello, I want to order: ${p.name}" class="btn-whatsapp" target="_blank">
-                <i class="fab fa-whatsapp"></i> Order via WhatsApp
-            </a>
-        </div>
-    `).join('');
+    async function loadData() {
+    try {
+        // Change the URL from 'products.json' to your local server API
+        const response = await fetch('http://localhost:3000/api/products');
+        inventory = await response.json();
+        renderCategories();
+        filterProducts('All');
+    } catch (e) { 
+        console.error("Could not load products from server:", e); 
+    }
 }
 
-    function performSearch() {
-        const query = document.getElementById('search-bar').value.toLowerCase();
-        const filtered = inventory.filter(p => 
-            p.name.toLowerCase().includes(query) || p.specs.toLowerCase().includes(query)
-        );
-        render(filtered);
+    function renderCategories() {
+        const nav = document.getElementById('category-nav');
+        nav.innerHTML = categories.map(cat => 
+            `<button class="cat-btn" onclick="filterProducts('${cat}')">${cat}</button>`
+        ).join('');
     }
-    document.getElementById('search-bar').addEventListener('keyup', performSearch);
+
+    function filterProducts(category) {
+        const query = document.getElementById('search-bar').value.toLowerCase();
+        const container = document.getElementById('product-container');
+        
+        const filtered = inventory.filter(p => {
+            const matchCat = (category === 'All' || p.category === category);
+            const matchSearch = p.name.toLowerCase().includes(query) || p.specs.toLowerCase().includes(query);
+            return matchCat && matchSearch;
+        });
+
+        container.innerHTML = filtered.map(p => `
+            <div class="card" style="cursor: pointer;">
+                <a href="product-detail.html?id=${p.id}" style="text-decoration: none; color: inherit;">
+                    <img src="http://localhost:3000${p.image}" alt="${p.name}">
+                    <h3>${p.name}</h3>
+                    <p><i class="fas fa-info-circle"></i> <strong>Specs:</strong> ${p.specs}</p>
+                    <p class="price"><span style="color:#333; font-size:0.9rem;">UGX</span> ${p.price}</p>
+                </a>
+                <a href="https://wa.me/${whatsappNumber}?text=Hello, I want to order: ${p.name}" class="btn-whatsapp" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Order via WhatsApp
+                </a>
+            </div>
+        `).join('');
+    }
+
+    document.getElementById('search-bar').addEventListener('keyup', () => filterProducts('All'));
 </script>
 </body>
 </html>

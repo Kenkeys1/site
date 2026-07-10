@@ -1,0 +1,58 @@
+[
+  {
+    "id": "1783678559491",
+    "name": "drill",
+    "specs": "super supper drill",
+    "price": "300,000",
+    "category": "Hand Tools",
+    "image": "/uploads/1783678559488.jfif"
+  },
+  {
+    "id": "1783678620689",
+    "name": "nut bolt",
+    "specs": "super tight",
+    "price": "50,000",
+    "category": "Fasteners",
+    "image": "/uploads/1783678620644.jfif"
+  },
+  {
+    "id": "1783678678525",
+    "name": "spanner",
+    "specs": "original super",
+    "price": "89,000",
+    "category": "Plumbing",
+    "image": "/uploads/1783678678496.jfif"
+  },
+  {
+    "id": "1783680207894",
+    "name": "ken keyz",
+    "specs": "pianist",
+    "price": "1,000,000",
+    "category": "Power Tools",
+    "image": "/uploads/1783680207855.jfif"
+  },
+  {
+    "id": "1783683793604",
+    "name": "tyuikhj",
+    "specs": "yuihjk",
+    "price": "4567890",
+    "category": "Lubricants",
+    "image": "/uploads/1783683793137.jfif"
+  },
+  {
+    "id": "1783683858244",
+    "name": "ijhijijijiuiu",
+    "specs": "okjkokokok",
+    "price": "345678987",
+    "category": "Hand Tools",
+    "image": "/uploads/1783683858216.jfif"
+  },
+  {
+    "id": "1783684706810",
+    "name": "tgtgtgtg",
+    "specs": "rtyuioertyhj",
+    "price": "1234567654",
+    "category": "Electrical",
+    "image": "/uploads/1783684706755.jfif"
+  }
+]

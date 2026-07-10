@@ -11,9 +11,7 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--gold); color: #333; line-height: 1.4; }
 
         header { background: var(--onyx); color: var(--gold); padding: 25px 15px; text-align: center; border-bottom: 4px solid var(--gold); }
-        .back-link { display: block; color: var(--white); text-decoration: none; margin-top: 10px; font-size: 0.9rem; }
-        
-        .search-wrap { background-color: rgb(83, 92, 92); padding: 30px 10px; text-align: center; background-image: url(Nut.jpg); }
+        .search-wrap { background-color: rgb(83, 92, 92); padding: 30px 10px; text-align: center; }
         .search-container { position: relative; width: 95%; max-width: 500px; margin: 0 auto; display: flex; align-items: center; }
         #search-bar { width: 100%; padding: 12px 40px 12px 20px; border: none; border-radius: 50px; font-size: 14px; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .search-icon-btn { position: absolute; right: 15px; cursor: pointer; color: #666; font-size: 18px; border: none; background: transparent; }
@@ -23,7 +21,8 @@
         .cat-btn:hover, .cat-btn.active { background: var(--gold); color: var(--onyx); }
 
         .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; padding: 10px; max-width: 1200px; margin: auto; }
-        .card { background: var(--white); padding: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 3px solid var(--gold); }
+        .card { background: var(--white); padding: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 3px solid var(--gold); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         .card img { width: 100%; height: 140px; object-fit: cover; border-radius: 2px; }
         .card h3 { margin: 8px 0; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--onyx); }
         .price { color: var(--gold); font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; }
@@ -32,15 +31,12 @@
         .btn-whatsapp:hover { background: var(--gold); color: var(--onyx); }
 
         footer { background: var(--onyx); color: var(--white); padding: 30px 10px; text-align: center; margin-top: 20px; font-size: 0.75rem; }
-        footer a { color: var(--white); text-decoration: none; }
-        footer i { color: var(--gold); font-size: 1.2rem; margin-bottom: 5px; display: block; }
     </style>
 </head>
 <body>
 
 <header>
     <h1><i class="fas fa-tools"></i> CATEGORIES</h1>
-    
 </header>
 
 <div class="search-wrap">
@@ -51,17 +47,12 @@
 </div>
 
 <div class="category-nav" id="category-nav"></div>
-
 <main id="product-container" class="container"></main>
 
 <footer>
-        <a href="mailto:kenkeys10000@gmail.com">
-            <i class="fas fa-headset"></i>
-            <h3>Support & Sales</h3>
-        </a>
-        <p>Available on WhatsApp: +256 743 462 531</p>
-        <p>&copy; 2026 Industrial Hardware Solutions</p>
-    </footer>
+    <p>Available on WhatsApp: +256 743 462 531</p>
+</footer>
+
 <script>
     let inventory = [];
     const whatsappNumber = "256743462531";
@@ -69,11 +60,12 @@
 
     async function loadData() {
         try {
-            const response = await fetch('products.json');
+            // Fix: Pointing to your server API
+            const response = await fetch('http://localhost:3000/api/products');
             inventory = await response.json();
             renderCategories();
             filterProducts('All');
-        } catch (e) { console.error("Error loading products"); }
+        } catch (e) { console.error("Error loading products:", e); }
     }
 
     function renderCategories() {
@@ -89,17 +81,20 @@
         
         const filtered = inventory.filter(p => {
             const matchCat = (category === 'All' || p.category === category);
-            const matchSearch = p.name.toLowerCase().includes(query) || p.specs.toLowerCase().includes(query);
+            const matchSearch = p.name.toLowerCase().includes(query) || (p.specs && p.specs.toLowerCase().includes(query));
             return matchCat && matchSearch;
         });
 
+        // Fix: Added the clickable link and backend image URL prefix to match homepage
         container.innerHTML = filtered.map(p => `
-            <div class="card">
-                <img src="${p.image}" alt="${p.name}">
-                <h3>${p.name}</h3>
-                <p><i class="fas fa-info-circle"></i> <strong>Specs:</strong> ${p.specs}</p>
-                <p class="price">${p.price}</p>
-                <a href="https://wa.me/${whatsappNumber}?text=I want to order: ${p.name}" class="btn-whatsapp" target="_blank">
+            <div class="card" style="cursor: pointer;">
+                <a href="product-detail.html?id=${p.id}" style="text-decoration: none; color: inherit;">
+                    <img src="http://localhost:3000${p.image}" alt="${p.name}">
+                    <h3>${p.name}</h3>
+                    <p><i class="fas fa-info-circle"></i> <strong>Specs:</strong> ${p.specs || ''}</p>
+                    <p class="price"><span style="color:#333; font-size:0.9rem;">UGX</span> ${p.price}</p>
+                </a>
+                <a href="https://wa.me/${whatsappNumber}?text=Hello, I want to order: ${p.name}" class="btn-whatsapp" target="_blank">
                     <i class="fab fa-whatsapp"></i> Order via WhatsApp
                 </a>
             </div>
