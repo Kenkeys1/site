@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Helper to read products
-const getProducts = () => JSON.parse(fs.readFileSync('products.json', 'utf8'));
+const getProducts = () => JSON.parse(fs.readFileSync(path.join(__dirname, 'products.json'), 'utf8'));
 
 // GET all products
 app.get('/api/products', (req, res) => {
