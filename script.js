@@ -26,6 +26,7 @@ function displayProducts(data) {
 }
 
 // Real-time search filter
+if (typeof document !== 'undefined') {
 document.getElementById('search-bar').addEventListener('keyup', (e) => {
     const searchString = e.target.value.toLowerCase();
     const filtered = inventory.filter(p => 
@@ -34,5 +35,6 @@ document.getElementById('search-bar').addEventListener('keyup', (e) => {
     );
     displayProducts(filtered);
 });
+}
 
 init();
