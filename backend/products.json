@@ -1,13 +1,5 @@
 [
   {
-    "id": "1783678559491",
-    "name": "drill",
-    "specs": "super supper drill",
-    "price": "300,000",
-    "category": "Hand Tools",
-    "image": "/uploads/1783678559488.jfif"
-  },
-  {
     "id": "1783678620689",
     "name": "nut bolt",
     "specs": "super tight",
@@ -54,5 +46,13 @@
     "price": "1234567654",
     "category": "Electrical",
     "image": "/uploads/1783684706755.jfif"
+  },
+  {
+    "id": "1783756603861",
+    "name": "drill",
+    "specs": "eheheh",
+    "price": "500,000",
+    "category": "Hand Tools",
+    "image": "/uploads/1783756603856.jfif"
   }
 ]
