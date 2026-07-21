@@ -3,7 +3,7 @@ let inventory = [];
 // Initialize the site
 async function init() {
     try {
-        const response = await fetch('products.json');
+        const response = await fetch('/api/products');
         inventory = await response.json();
         displayProducts(inventory);
     } catch (err) {
