@@ -16,14 +16,6 @@
     "image": "/uploads/1783678678496.jfif"
   },
   {
-    "id": "1783680207894",
-    "name": "ken keyz",
-    "specs": "pianist",
-    "price": "1,000,000",
-    "category": "Power Tools",
-    "image": "/uploads/1783680207855.jfif"
-  },
-  {
     "id": "1783683793604",
     "name": "tyuikhj",
     "specs": "yuihjk",
@@ -54,5 +46,21 @@
     "price": "500,000",
     "category": "Hand Tools",
     "image": "/uploads/1783756603856.jfif"
+  },
+  {
+    "id": "1784672758029",
+    "name": "kenneth",
+    "specs": "man",
+    "price": "1,000,000",
+    "category": "Electrical",
+    "image": "/uploads/1784672757410.jpg"
+  },
+  {
+    "id": "1784672758606",
+    "name": "kawuma",
+    "specs": "brooo",
+    "price": "1,000,000",
+    "category": "Fasteners",
+    "image": "/uploads/1784672904895.jfif"
   }
 ]
