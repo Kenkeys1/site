@@ -3,7 +3,7 @@ let inventory = [];
 // Initialize the site
 async function init() {
     try {
-        const response = await fetch('https://site-production-b156.up.railway.app/api/products');
+        const response = await fetch('products.js');
         inventory = await response.json();
         displayProducts(inventory);
     } catch (err) {
