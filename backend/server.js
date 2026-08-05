@@ -8,6 +8,10 @@ const app = express();
 app.use(cors());
 // Note: We don't use express.json() with multer, as multer parses the FormData
 app.use('/uploads', express.static('uploads'));
+app.get('/', (req, res) => {
+  res.send('Server is running and ready!');
+});
+
 
 const storage = multer.diskStorage({
     destination: './uploads/',
