@@ -3,7 +3,7 @@ let inventory = [];
 // Initialize the site
 async function init() {
     try {
-        const response = await fetch('products.js');
+        const response = await fetch('https://site-vctv.onrender.com');
         inventory = await response.json();
         displayProducts(inventory);
     } catch (err) {
