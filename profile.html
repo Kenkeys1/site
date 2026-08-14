@@ -180,7 +180,11 @@
 
             const username = usernameInput ? usernameInput.value.trim() : "";
             const email = emailInput ? emailInput.value.trim() : "";
-            const phone = iti ? iti.getNumber() : (phoneInput ? phoneInput.value.trim() : "");
+            
+            // Fixed raw value evaluation so valid typed numbers are not cleared out
+            const rawPhone = phoneInput ? phoneInput.value.trim() : "";
+            const phone = (iti && iti.getNumber()) ? iti.getNumber() : rawPhone;
+
             const p1 = p1Input ? p1Input.value : "";
             const p2 = p2Input ? p2Input.value : "";
 
