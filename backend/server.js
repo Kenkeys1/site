@@ -69,38 +69,44 @@ const saveUsers = (users) => {
 
 // --- USER AUTHENTICATION ENDPOINTS ---
 
-// SIGN UP API
-app.post('/api/signup', (req, res) => {
-    const { username, email, phone, password } = req.body;
-    const users = getUsers();
+// SIGN UP API (Updated with upload.single middleware to process multipart FormData)
+app.post('/api/signup', upload.single('profileImage'), (req, res) => {
+    try {
+        const { username, email, phone, password } = req.body;
+        const users = getUsers();
 
-    const existingUser = users.find(u => u.username === username || u.email === email);
-    if (existingUser) {
-        return res.status(400).json({ success: false, message: 'Username or Email already exists.' });
+        const existingUser = users.find(u => u.username === username || u.email === email);
+        if (existingUser) {
+            return res.status(400).json({ success: false, message: 'Username or Email already exists.' });
+        }
+
+        const newUser = {
+            id: Date.now().toString(),
+            username,
+            email,
+            phone,
+            password,
+            profileImage: req.file ? '/uploads/' + req.file.filename : ''
+        };
+
+        users.push(newUser);
+        saveUsers(users);
+
+        const { password: _, ...userWithoutPassword } = newUser;
+        res.json({ success: true, user: userWithoutPassword });
+    } catch (err) {
+        console.error("Signup error:", err);
+        res.status(500).json({ success: false, message: 'Server error during sign up!' });
     }
-
-    const newUser = {
-        id: Date.now().toString(),
-        username,
-        email,
-        phone,
-        password,
-        profileImage: ''
-    };
-
-    users.push(newUser);
-    saveUsers(users);
-
-    const { password: _, ...userWithoutPassword } = newUser;
-    res.json({ success: true, user: userWithoutPassword });
 });
 
 // LOGIN API
 app.post('/api/login', (req, res) => {
-    const { username, password } = req.body;
+    const { identifier, username, password } = req.body;
+    const userIdentifier = identifier || username;
     const users = getUsers();
 
-    const user = users.find(u => (u.username === username || u.email === username) && u.password === password);
+    const user = users.find(u => (u.username === userIdentifier || u.email === userIdentifier) && u.password === password);
     if (!user) {
         return res.status(401).json({ success: false, message: 'Invalid username/email or password.' });
     }
