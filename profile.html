@@ -6,6 +6,7 @@
     <title>My Profile - Precision Hardware</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
     <style>
         :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --navy: #001f3f; --orange: #ffa500; }
         body { font-family: 'Segoe UI', sans-serif; background: #0a0909; color: #333; margin: 0; }
@@ -29,7 +30,7 @@
 
         /* Auth Modal */
         #auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .modal-box { background: var(--white); padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 0 20px var(--gold); }
+        .modal-box { background: var(--white); padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 0 20px var(--gold); max-height: 90vh; overflow-y: auto; }
         .input-group { margin-bottom: 15px; width: 100%; position: relative; }
         input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         .iti { width: 100%; } 
@@ -40,6 +41,11 @@
         
         /* Logout Button */
         #logout-btn { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background: var(--gold); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        /* Cropper Container Style */
+        .crop-container { width: 100%; max-height: 250px; margin-bottom: 10px; display: none; background: #000; }
+        .crop-container img { max-width: 100%; display: block; }
+        .btn-crop { background: var(--gold); color: var(--onyx); border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-bottom: 10px; width: 100%; display: none; }
     </style>
 </head>
 <body>
@@ -91,10 +97,13 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script>
     const SERVER_URL = "https://site-vctv.onrender.com";
     let isSignupMode = false;
     let iti = null;
+    let cropper = null;
+    let croppedBlob = null;
 
     window.onload = function() {
         if (localStorage.getItem('isLoggedIn') === 'true' && localStorage.getItem('userId')) {
@@ -124,17 +133,59 @@
         }
     }
 
+    function handleImageSelect(e) {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            const file = files[0];
+            const url = URL.createObjectURL(file);
+            const image = document.getElementById('crop-image');
+            image.src = url;
+            
+            document.getElementById('crop-container').style.display = 'block';
+            document.getElementById('btn-crop-action').style.display = 'block';
+
+            if (cropper) {
+                cropper.destroy();
+            }
+
+            cropper = new Cropper(image, {
+                aspectRatio: 1,
+                viewMode: 1,
+                background: false
+            });
+        }
+    }
+
+    function cropImage() {
+        if (cropper) {
+            cropper.getCroppedCanvas({
+                width: 300,
+                height: 300
+            }).toBlob((blob) => {
+                croppedBlob = blob;
+                alert("Profile image cropped successfully!");
+                document.getElementById('crop-container').style.display = 'none';
+                document.getElementById('btn-crop-action').style.display = 'none';
+            }, 'image/jpeg');
+        }
+    }
+
     async function validateAndFinish() {
         if (isSignupMode) {
-            const username = document.getElementById('user-field').value.trim();
-            const email = document.getElementById('email-field').value.trim();
-            const phone = iti ? iti.getNumber() : document.getElementById('phone').value.trim();
-            const p1 = document.getElementById('p1').value;
-            const p2 = document.getElementById('p2').value;
-            const profileImageInput = document.getElementById('profile-image');
+            const usernameInput = document.getElementById('user-field');
+            const emailInput = document.getElementById('email-field');
+            const phoneInput = document.getElementById('phone');
+            const p1Input = document.getElementById('p1');
+            const p2Input = document.getElementById('p2');
+
+            const username = usernameInput ? usernameInput.value.trim() : "";
+            const email = emailInput ? emailInput.value.trim() : "";
+            const phone = iti ? iti.getNumber() : (phoneInput ? phoneInput.value.trim() : "");
+            const p1 = p1Input ? p1Input.value : "";
+            const p2 = p2Input ? p2Input.value : "";
 
             if (!username || !email || !phone || !p1 || !p2) {
-                alert("Please fill in all fields.");
+                alert("Please fill in all sections.");
                 return;
             }
 
@@ -148,8 +199,14 @@
             formData.append('email', email);
             formData.append('phone', phone);
             formData.append('password', p1);
-            if (profileImageInput && profileImageInput.files[0]) {
-                formData.append('profileImage', profileImageInput.files[0]);
+            
+            if (croppedBlob) {
+                formData.append('profileImage', croppedBlob, 'profile.jpg');
+            } else {
+                const profileImageInput = document.getElementById('profile-image');
+                if (profileImageInput && profileImageInput.files[0]) {
+                    formData.append('profileImage', profileImageInput.files[0]);
+                }
             }
 
             try {
@@ -176,11 +233,14 @@
             }
 
         } else {
-            const identifier = document.getElementById('user-field').value.trim();
-            const pass = document.getElementById('pass1').value;
+            const identifierInput = document.getElementById('user-field');
+            const passInput = document.getElementById('pass1');
+
+            const identifier = identifierInput ? identifierInput.value.trim() : "";
+            const pass = passInput ? passInput.value : "";
 
             if (!identifier || !pass) {
-                alert("Please fill in all fields.");
+                alert("Please fill in all sections.");
                 return;
             }
 
@@ -223,7 +283,13 @@
             <input type="email" placeholder="Email" id="email-field" style="margin-bottom:10px" required>
             <input type="tel" id="phone" style="margin-bottom:10px" required>
             <label style="font-size:0.8rem; color:#666;">Profile Photo:</label>
-            <input type="file" id="profile-image" accept="image/*" style="margin-bottom:10px">
+            <input type="file" id="profile-image" accept="image/*" style="margin-bottom:10px" onchange="handleImageSelect(event)">
+            
+            <div class="crop-container" id="crop-container">
+                <img id="crop-image" src="" alt="Crop Preview">
+            </div>
+            <button type="button" id="btn-crop-action" class="btn-crop" onclick="cropImage()">Crop & Set Photo</button>
+
             <div class="input-group">
                 <input type="password" id="p1" placeholder="Password" required>
                 <i class="fas fa-eye toggle-password" onclick="togglePass('p1', this)"></i>
