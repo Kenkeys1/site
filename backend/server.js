@@ -30,8 +30,9 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Path to products.json
+// Path to products.json & users.json
 const productsFilePath = path.join(__dirname, 'products.json');
+const usersFilePath = path.join(__dirname, 'users.json');
 
 // Helper to read products safely
 const getProducts = () => {
@@ -47,6 +48,87 @@ const getProducts = () => {
     }
 };
 
+// Helper to read users safely
+const getUsers = () => {
+    if (!fs.existsSync(usersFilePath)) {
+        fs.writeFileSync(usersFilePath, JSON.stringify([]));
+        return [];
+    }
+    try {
+        const data = fs.readFileSync(usersFilePath, 'utf8');
+        return JSON.parse(data || '[]');
+    } catch (err) {
+        return [];
+    }
+};
+
+// Helper to save users
+const saveUsers = (users) => {
+    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+};
+
+// --- USER AUTHENTICATION ENDPOINTS ---
+
+// SIGN UP API
+app.post('/api/signup', (req, res) => {
+    const { username, email, phone, password } = req.body;
+    const users = getUsers();
+
+    const existingUser = users.find(u => u.username === username || u.email === email);
+    if (existingUser) {
+        return res.status(400).json({ success: false, message: 'Username or Email already exists.' });
+    }
+
+    const newUser = {
+        id: Date.now().toString(),
+        username,
+        email,
+        phone,
+        password,
+        profileImage: ''
+    };
+
+    users.push(newUser);
+    saveUsers(users);
+
+    const { password: _, ...userWithoutPassword } = newUser;
+    res.json({ success: true, user: userWithoutPassword });
+});
+
+// LOGIN API
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    const users = getUsers();
+
+    const user = users.find(u => (u.username === username || u.email === username) && u.password === password);
+    if (!user) {
+        return res.status(401).json({ success: false, message: 'Invalid username/email or password.' });
+    }
+
+    const { password: _, ...userWithoutPassword } = user;
+    res.json({ success: true, user: userWithoutPassword });
+});
+
+// UPLOAD PROFILE PHOTO API
+app.post('/api/user/upload-photo', upload.single('profileImage'), (req, res) => {
+    const { userId } = req.body;
+    let users = getUsers();
+
+    const index = users.findIndex(u => u.id == userId);
+    if (index !== -1) {
+        if (req.file) {
+            users[index].profileImage = '/uploads/' + req.file.filename;
+            saveUsers(users);
+            const { password: _, ...userWithoutPassword } = users[index];
+            return res.json({ success: true, user: userWithoutPassword });
+        }
+        return res.status(400).json({ success: false, message: 'No file uploaded.' });
+    }
+    res.status(404).json({ success: false, message: 'User not found.' });
+});
+
+// --- PRODUCT ENDPOINTS ---
+
 // GET all products
 app.get('/api/products', (req, res) => {
     res.json(getProducts());
@@ -56,7 +138,7 @@ app.get('/api/products', (req, res) => {
 app.post('/api/products/add', upload.single('image'), (req, res) => {
     const products = getProducts();
     const newProduct = {
-        id: Date.now().toString(), // Store as string for consistency
+        id: Date.now().toString(),
         ...req.body,
         image: req.file ? '/uploads/' + req.file.filename : ''
     };
@@ -68,7 +150,7 @@ app.post('/api/products/add', upload.single('image'), (req, res) => {
 // EDIT product
 app.post('/api/products/edit', upload.single('image'), (req, res) => {
     let products = getProducts();
-    const id = req.body.id; // Keep as string
+    const id = req.body.id;
     const index = products.findIndex(p => p.id == id);
     
     if (index !== -1) {
@@ -86,7 +168,6 @@ app.post('/api/products/edit', upload.single('image'), (req, res) => {
 // DELETE product
 app.delete('/api/products/:id', (req, res) => {
     let products = getProducts();
-    // Using loose equality (==) to match string or number IDs
     products = products.filter(p => p.id != req.params.id);
     fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
     res.json({ success: true });

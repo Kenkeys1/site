@@ -62,8 +62,8 @@
                 <h2><i class="fas fa-box-open"></i> Orders</h2>
                 <ul>
                     <li onclick="event.stopPropagation(); alert('Order History')">Order History</li>
-                    <li onclick="event.stopPropagation(); alert('Reorder')">Quick Reorder</li>
-                    <li onclick="event.stopPropagation(); alert('Tracking')">Track Shipments</li>
+                    <li onclick="event.stopPropagation(); alert('Quick Reorder')">Quick Reorder</li>
+                    <li onclick="event.stopPropagation(); alert('Track Shipments')">Track Shipments</li>
                 </ul>
             </div>
         </a>
@@ -92,8 +92,12 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 <script>
+    const SERVER_URL = "https://site-vctv.onrender.com";
+    let isSignupMode = false;
+    let iti = null;
+
     window.onload = function() {
-        if (localStorage.getItem('isLoggedIn') === 'true') {
+        if (localStorage.getItem('isLoggedIn') === 'true' && localStorage.getItem('userId')) {
             document.getElementById('auth-modal').style.display = 'none';
             document.getElementById('profile-content').style.filter = 'none';
             document.getElementById('profile-content').style.pointerEvents = 'auto';
@@ -102,6 +106,8 @@
 
     function logout() {
         localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('user');
         location.reload();
     }
 
@@ -118,25 +124,90 @@
         }
     }
 
-    function validateAndFinish() {
-        const inputs = document.querySelectorAll('#login-box input');
-        for (let input of inputs) {
-            if (input.value.trim() === "") {
-                input.focus();
+    async function validateAndFinish() {
+        if (isSignupMode) {
+            const username = document.getElementById('user-field').value.trim();
+            const email = document.getElementById('email-field').value.trim();
+            const phone = iti ? iti.getNumber() : document.getElementById('phone').value.trim();
+            const p1 = document.getElementById('p1').value;
+            const p2 = document.getElementById('p2').value;
+            const profileImageInput = document.getElementById('profile-image');
+
+            if (!username || !email || !phone || !p1 || !p2) {
                 alert("Please fill in all fields.");
                 return;
             }
+
+            if (p1 !== p2) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('username', username);
+            formData.append('email', email);
+            formData.append('phone', phone);
+            formData.append('password', p1);
+            if (profileImageInput && profileImageInput.files[0]) {
+                formData.append('profileImage', profileImageInput.files[0]);
+            }
+
+            try {
+                const res = await fetch(`${SERVER_URL}/api/signup`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userId', result.user.id);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                    
+                    document.getElementById('auth-modal').style.display = 'none';
+                    document.getElementById('profile-content').style.filter = 'none';
+                    document.getElementById('profile-content').style.pointerEvents = 'auto';
+                } else {
+                    alert(result.message || "Signup failed!");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Server error during sign up!");
+            }
+
+        } else {
+            const identifier = document.getElementById('user-field').value.trim();
+            const pass = document.getElementById('pass1').value;
+
+            if (!identifier || !pass) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`${SERVER_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier, password: pass })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userId', result.user.id);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+
+                    document.getElementById('auth-modal').style.display = 'none';
+                    document.getElementById('profile-content').style.filter = 'none';
+                    document.getElementById('profile-content').style.pointerEvents = 'auto';
+                } else {
+                    alert(result.message || "Invalid credentials!");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Server error during sign in!");
+            }
         }
-        const p1 = document.getElementById('p1');
-        const p2 = document.getElementById('p2');
-        if (p1 && p2 && p1.value !== p2.value) {
-            alert("Passwords do not match!");
-            return;
-        }
-        localStorage.setItem('isLoggedIn', 'true');
-        document.getElementById('auth-modal').style.display = 'none';
-        document.getElementById('profile-content').style.filter = 'none';
-        document.getElementById('profile-content').style.pointerEvents = 'auto';
     }
 
     function forgotPassword() {
@@ -145,11 +216,14 @@
     }
 
     function switchToSignup() {
+        isSignupMode = true;
         document.getElementById('modal-title').innerText = "Create Account";
         document.getElementById('login-box').innerHTML = `
             <input type="text" placeholder="Username" id="user-field" style="margin-bottom:10px" required>
             <input type="email" placeholder="Email" id="email-field" style="margin-bottom:10px" required>
             <input type="tel" id="phone" style="margin-bottom:10px" required>
+            <label style="font-size:0.8rem; color:#666;">Profile Photo:</label>
+            <input type="file" id="profile-image" accept="image/*" style="margin-bottom:10px">
             <div class="input-group">
                 <input type="password" id="p1" placeholder="Password" required>
                 <i class="fas fa-eye toggle-password" onclick="togglePass('p1', this)"></i>
@@ -161,7 +235,7 @@
             <button class="btn-auth" onclick="validateAndFinish()">Finish Sign Up</button>
             <p style="text-align: center; margin-top: 10px; cursor: pointer;" onclick="location.reload()">Already have an account? Sign In</p>
         `;
-        intlTelInput(document.querySelector("#phone"), { initialCountry: "ug" });
+        iti = intlTelInput(document.querySelector("#phone"), { initialCountry: "ug" });
     }
 </script>
 </body>
