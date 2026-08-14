@@ -1,5 +1,13 @@
 [
   {
+    "id": "1783678620689",
+    "name": "nut bolt",
+    "specs": "super tight",
+    "price": "50,000",
+    "category": "Fasteners",
+    "image": "/uploads/1783678620644.jfif"
+  },
+  {
     "id": "1783678678525",
     "name": "spanner",
     "specs": "original super",
@@ -46,13 +54,5 @@
     "price": "1,000,000",
     "category": "Electrical",
     "image": "/uploads/1784672757410.jpg"
-  },
-  {
-    "id": "1784672758606",
-    "name": "kawuma",
-    "specs": "brooo",
-    "price": "1,000,000",
-    "category": "Fasteners",
-    "image": "/uploads/1784672904895.jfif"
   }
 ]

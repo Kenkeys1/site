@@ -6,21 +6,46 @@ const path = require('path');
 const app = express();
 
 app.use(cors());
-// Note: We don't use express.json() with multer, as multer parses the FormData
-app.use('/uploads', express.static('uploads'));
+
+// Parse JSON request bodies for standard API requests (e.g. non-file updates)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static uploaded images
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.get('/', (req, res) => {
   res.send('Server is running and ready!');
 });
 
+// Ensure uploads folder exists so Multer doesn't fail
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 const storage = multer.diskStorage({
-    destination: './uploads/',
+    destination: (req, file, cb) => cb(null, uploadDir),
     filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
 });
 const upload = multer({ storage });
 
-// Helper to read products
-const getProducts = () => JSON.parse(fs.readFileSync(path.join(__dirname, 'products.json'), 'utf8'));
+// Path to products.json
+const productsFilePath = path.join(__dirname, 'products.json');
+
+// Helper to read products safely
+const getProducts = () => {
+    if (!fs.existsSync(productsFilePath)) {
+        fs.writeFileSync(productsFilePath, JSON.stringify([]));
+        return [];
+    }
+    try {
+        const data = fs.readFileSync(productsFilePath, 'utf8');
+        return JSON.parse(data || '[]');
+    } catch (err) {
+        return [];
+    }
+};
 
 // GET all products
 app.get('/api/products', (req, res) => {
@@ -36,7 +61,7 @@ app.post('/api/products/add', upload.single('image'), (req, res) => {
         image: req.file ? '/uploads/' + req.file.filename : ''
     };
     products.push(newProduct);
-    fs.writeFileSync('products.json', JSON.stringify(products, null, 2));
+    fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
     res.json(newProduct);
 });
 
@@ -51,7 +76,7 @@ app.post('/api/products/edit', upload.single('image'), (req, res) => {
         if (req.file) {
             products[index].image = '/uploads/' + req.file.filename;
         }
-        fs.writeFileSync('products.json', JSON.stringify(products, null, 2));
+        fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
         res.json({ success: true });
     } else {
         res.status(404).json({ error: "Product not found" });
@@ -63,7 +88,7 @@ app.delete('/api/products/:id', (req, res) => {
     let products = getProducts();
     // Using loose equality (==) to match string or number IDs
     products = products.filter(p => p.id != req.params.id);
-    fs.writeFileSync('products.json', JSON.stringify(products, null, 2));
+    fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
     res.json({ success: true });
 });
 
