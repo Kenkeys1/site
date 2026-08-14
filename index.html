@@ -171,16 +171,16 @@
     const categories = ['All', 'Power Tools', 'Hand Tools', 'Fasteners', 'Safety Gear', 'Plumbing', 'Electrical', 'Measuring Tools', 'Lubricants'];
 
     async function loadData() {
-    try {
-        // Change the URL from 'products.json' to your local server API
-        const response = await fetch('http://localhost:3000/api/products');
-        inventory = await response.json();
-        renderCategories();
-        filterProducts('All');
-    } catch (e) { 
-        console.error("Could not load products from server:", e); 
+        try {
+            // Updated to fetch from live Render backend
+            const response = await fetch('https://site-vctv.onrender.com/api/products');
+            inventory = await response.json();
+            renderCategories();
+            filterProducts('All');
+        } catch (e) { 
+            console.error("Could not load products from server:", e); 
+        }
     }
-}
 
     function renderCategories() {
         const nav = document.getElementById('category-nav');
@@ -202,7 +202,7 @@
         container.innerHTML = filtered.map(p => `
             <div class="card" style="cursor: pointer;">
                 <a href="product-detail.html?id=${p.id}" style="text-decoration: none; color: inherit;">
-                    <img src="http://localhost:3000${p.image}" alt="${p.name}">
+                    <img src="https://site-vctv.onrender.com${p.image}" alt="${p.name}">
                     <h3>${p.name}</h3>
                     <p><i class="fas fa-info-circle"></i> <strong>Specs:</strong> ${p.specs}</p>
                     <p class="price"><span style="color:#333; font-size:0.9rem;">UGX</span> ${p.price}</p>
