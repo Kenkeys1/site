@@ -50,7 +50,7 @@
         const imageFile = document.getElementById('image').files[0];
         if (imageFile) formData.append('image', imageFile);
 
-        const url = id ? 'http://localhost:3000/api/products/edit' : 'http://localhost:3000/api/products/add';
+        const url = id ? 'https://site-vctv.onrender.com/api/products/edit' : 'https://site-vctv.onrender.com/api/products/add';
         
         await fetch(url, { method: 'POST', body: formData });
         resetForm();
@@ -58,12 +58,12 @@
     }
 
     async function loadInventory() {
-        const res = await fetch('http://localhost:3000/api/products');
+        const res = await fetch('https://site-vctv.onrender.com/api/products');
         const data = await res.json();
         const list = document.getElementById('product-list');
         list.innerHTML = data.map(p => `
             <tr>
-                <td><img src="http://localhost:3000${p.image}" width="50"></td>
+                <td><img src="https://site-vctv.onrender.com${p.image}" width="50"></td>
                 <td>${p.name}</td>
                 <td>${p.specs}</td>
                 <td><span class="price-tag">UGX</span> ${p.price}</td>
@@ -96,7 +96,7 @@
 
     async function deleteProduct(id) {
         if(confirm('Delete this product?')) {
-            await fetch(`http://localhost:3000/api/products/${id}`, { method: 'DELETE' });
+            await fetch(`https://site-vctv.onrender.com/api/products/${id}`, { method: 'DELETE' });
             loadInventory();
         }
     }
