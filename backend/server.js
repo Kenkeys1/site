@@ -69,23 +69,32 @@ const saveUsers = (users) => {
 
 // --- USER AUTHENTICATION ENDPOINTS ---
 
-// SIGN UP API (Updated with upload.single middleware to process multipart FormData)
+// SIGN UP API
 app.post('/api/signup', upload.single('profileImage'), (req, res) => {
     try {
         const { username, email, phone, password } = req.body;
         const users = getUsers();
 
-        const existingUser = users.find(u => u.username === username || u.email === email);
+        const cleanUsername = (username || '').trim();
+        const cleanEmail = (email || '').trim().toLowerCase();
+        const cleanPhone = (phone || '').trim();
+        const cleanPassword = (password || '');
+
+        const existingUser = users.find(u => 
+            (u.username && u.username.toLowerCase() === cleanUsername.toLowerCase()) || 
+            (u.email && u.email.toLowerCase() === cleanEmail)
+        );
+
         if (existingUser) {
             return res.status(400).json({ success: false, message: 'Username or Email already exists.' });
         }
 
         const newUser = {
             id: Date.now().toString(),
-            username,
-            email,
-            phone,
-            password,
+            username: cleanUsername,
+            email: cleanEmail,
+            phone: cleanPhone,
+            password: cleanPassword,
             profileImage: req.file ? '/uploads/' + req.file.filename : ''
         };
 
@@ -102,17 +111,33 @@ app.post('/api/signup', upload.single('profileImage'), (req, res) => {
 
 // LOGIN API
 app.post('/api/login', (req, res) => {
-    const { identifier, username, password } = req.body;
-    const userIdentifier = identifier || username;
-    const users = getUsers();
+    try {
+        const { identifier, username, password } = req.body;
+        const rawIdentifier = identifier || username || '';
+        const cleanIdentifier = rawIdentifier.trim().toLowerCase();
+        const cleanPassword = password || '';
 
-    const user = users.find(u => (u.username === userIdentifier || u.email === userIdentifier) && u.password === password);
-    if (!user) {
-        return res.status(401).json({ success: false, message: 'Invalid username/email or password.' });
+        const users = getUsers();
+
+        const user = users.find(u => {
+            const matchUsername = u.username && u.username.toLowerCase() === cleanIdentifier;
+            const matchEmail = u.email && u.email.toLowerCase() === cleanIdentifier;
+            const matchPhone = u.phone && u.phone.trim() === rawIdentifier.trim();
+            const matchPassword = u.password === cleanPassword;
+
+            return (matchUsername || matchEmail || matchPhone) && matchPassword;
+        });
+
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'Invalid username/email or password.' });
+        }
+
+        const { password: _, ...userWithoutPassword } = user;
+        res.json({ success: true, user: userWithoutPassword });
+    } catch (err) {
+        console.error("Login error:", err);
+        res.status(500).json({ success: false, message: 'Server error during sign in!' });
     }
-
-    const { password: _, ...userWithoutPassword } = user;
-    res.json({ success: true, user: userWithoutPassword });
 });
 
 // UPLOAD PROFILE PHOTO API
