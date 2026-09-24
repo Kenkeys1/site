@@ -139,6 +139,12 @@
     }
 
     loadInventory();
+    document.getElementById('price').addEventListener('input', (e) => {
+  let val = e.target.value.replace(/,/g, '');
+  if (!isNaN(val) && val !== '') {
+    e.target.value = Number(val).toLocaleString();
+  }
+});
 </script>
 </body>
 </html>
