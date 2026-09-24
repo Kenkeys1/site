@@ -50,6 +50,7 @@ const productSchema = new mongoose.Schema({
   price: Number,
   category: String,
   description: String,
+  specs: String,
   image: { type: String, default: '' }
 }, { strict: false, timestamps: true });
 
@@ -79,6 +80,17 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
 });
 const upload = multer({ storage });
+
+// Helper middleware to catch Multer errors gracefully
+const handleUpload = (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      console.error("Multer error during upload:", err);
+      return res.status(400).json({ error: "File upload error: " + err.message });
+    }
+    next();
+  });
+};
 
 // --- USER AUTHENTICATION ENDPOINTS ---
 
@@ -196,46 +208,69 @@ app.get('/api/products', async (req, res) => {
 });
 
 // ADD product
-app.post('/api/products/add', upload.single('image'), async (req, res) => {
+app.post('/api/products/add', handleUpload, async (req, res) => {
   try {
-    const newProduct = new Product({
-      ...req.body,
-      image: req.file ? '/uploads/' + req.file.filename : ''
-    });
+    const productData = { ...req.body };
+
+    if (productData.price) {
+      productData.price = Number(productData.price);
+    }
+
+    if (req.file) {
+      productData.image = '/uploads/' + req.file.filename;
+    }
+
+    const newProduct = new Product(productData);
     await newProduct.save();
     res.json(newProduct);
   } catch (err) {
     console.error("Add product error:", err);
-    res.status(500).json({ error: "Failed to add product" });
+    res.status(500).json({ error: "Failed to add product: " + err.message });
   }
 });
 
 // EDIT product
-app.post('/api/products/edit', upload.single('image'), async (req, res) => {
+app.post('/api/products/edit', handleUpload, async (req, res) => {
   try {
     const id = req.body.id;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid or missing product ID" });
+    }
+
     const product = await Product.findById(id);
 
     if (product) {
-      Object.assign(product, req.body);
+      const updateData = { ...req.body };
+      if (updateData.price) {
+        updateData.price = Number(updateData.price);
+      }
+
+      Object.assign(product, updateData);
+
       if (req.file) {
         product.image = '/uploads/' + req.file.filename;
       }
+
       await product.save();
-      res.json({ success: true });
+      res.json({ success: true, product });
     } else {
       res.status(404).json({ error: "Product not found" });
     }
   } catch (err) {
     console.error("Edit product error:", err);
-    res.status(500).json({ error: "Failed to edit product" });
+    res.status(500).json({ error: "Failed to edit product: " + err.message });
   }
 });
 
 // DELETE product
 app.delete('/api/products/:id', async (req, res) => {
   try {
-    await Product.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid product ID" });
+    }
+
+    await Product.findByIdAndDelete(id);
     res.json({ success: true });
   } catch (err) {
     console.error("Delete product error:", err);
