@@ -52,7 +52,7 @@
 
         const url = id ? 'https://site-vctv.onrender.com/api/products/edit' : 'https://site-vctv.onrender.com/api/products/add';
         
-        await fetch(url, { method: 'POST', body: formData });
+        await fetch(url, { method: 'PUT', body: formData });
         resetForm();
         loadInventory();
     }
