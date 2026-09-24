@@ -47,42 +47,67 @@
         formData.append('price', document.getElementById('price').value.replace('UGX ', ''));
         formData.append('category', document.getElementById('category').value);
         
-        const imageFile = document.getElementById('image').files[0];
-        if (imageFile) formData.append('image', imageFile);
+        const imageFileInput = document.getElementById('image');
+        if (imageFileInput && imageFileInput.files && imageFileInput.files[0]) {
+            formData.append('image', imageFileInput.files[0]);
+        }
 
         const url = id ? 'https://site-vctv.onrender.com/api/products/edit' : 'https://site-vctv.onrender.com/api/products/add';
         
-        await fetch(url, { method: 'POST', body: formData });
-        resetForm();
-        loadInventory();
+        try {
+            const res = await fetch(url, { method: 'POST', body: formData });
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                alert('Error saving product: ' + (errData.error || errData.message || res.statusText));
+                return;
+            }
+            resetForm();
+            loadInventory();
+        } catch (err) {
+            console.error('Error saving product:', err);
+            alert('Failed to connect to server.');
+        }
     }
 
     async function loadInventory() {
-        const res = await fetch('https://site-vctv.onrender.com/api/products');
-        const data = await res.json();
-        const list = document.getElementById('product-list');
-        list.innerHTML = data.map(p => `
-            <tr>
-                <td><img src="https://site-vctv.onrender.com${p.image}" width="50"></td>
-                <td>${p.name}</td>
-                <td>${p.specs}</td>
-                <td><span class="price-tag">UGX</span> ${p.price}</td>
-                <td>${p.category}</td>
-                <td>
-                    <button class="btn" onclick='editProduct(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Edit</button>
-                    <button class="btn" onclick="deleteProduct('${p.id}')">Delete</button>
-                </td>
-            </tr>
-        `).join('');
+        try {
+            const res = await fetch('https://site-vctv.onrender.com/api/products');
+            const data = await res.json();
+            const list = document.getElementById('product-list');
+            
+            list.innerHTML = data.map(p => {
+                const productId = p.id || p._id || '';
+                const imageUrl = p.image ? (p.image.startsWith('http') ? p.image : 'https://site-vctv.onrender.com' + p.image) : '';
+                const displayPrice = p.price !== undefined && p.price !== null ? p.price : '';
+                
+                return `
+                    <tr>
+                        <td>${imageUrl ? `<img src="${imageUrl}" width="50">` : ''}</td>
+                        <td>${p.name || ''}</td>
+                        <td>${p.specs || ''}</td>
+                        <td><span class="price-tag">UGX</span> ${displayPrice}</td>
+                        <td>${p.category || ''}</td>
+                        <td>
+                            <button class="btn" onclick='editProduct(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Edit</button>
+                            <button class="btn" onclick="deleteProduct('${productId}')">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        } catch (err) {
+            console.error('Failed to load inventory:', err);
+        }
     }
 
     function editProduct(p) {
-        document.getElementById('edit-id').value = p.id;
-        document.getElementById('name').value = p.name;
-        document.getElementById('specs').value = p.specs;
+        document.getElementById('edit-id').value = p.id || p._id || '';
+        document.getElementById('name').value = p.name || '';
+        document.getElementById('specs').value = p.specs || '';
         // Strip the UGX if it exists for clean editing
-        document.getElementById('price').value = p.price.toString().replace('UGX ', '');
-        document.getElementById('category').value = p.category;
+        const rawPrice = p.price !== undefined && p.price !== null ? p.price.toString() : '';
+        document.getElementById('price').value = rawPrice.replace('UGX ', '');
+        document.getElementById('category').value = p.category || '';
+        document.getElementById('image').value = '';
         document.getElementById('form-title').innerText = "Edit Product";
     }
 
@@ -91,13 +116,25 @@
         document.getElementById('name').value = '';
         document.getElementById('specs').value = '';
         document.getElementById('price').value = '';
+        document.getElementById('image').value = '';
         document.getElementById('form-title').innerText = "Add New Product";
     }
 
     async function deleteProduct(id) {
-        if(confirm('Delete this product?')) {
-            await fetch(`https://site-vctv.onrender.com/api/products/${id}`, { method: 'DELETE' });
-            loadInventory();
+        if (!id) {
+            alert('Invalid product ID');
+            return;
+        }
+        if (confirm('Delete this product?')) {
+            try {
+                const res = await fetch(`https://site-vctv.onrender.com/api/products/${id}`, { method: 'DELETE' });
+                if (!res.ok) {
+                    alert('Failed to delete product.');
+                }
+                loadInventory();
+            } catch (err) {
+                console.error('Error deleting product:', err);
+            }
         }
     }
 
