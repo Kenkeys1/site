@@ -11,8 +11,41 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--gold); color: #333; line-height: 1.4; }
 
         header { background: var(--onyx); color: var(--gold); padding: 25px 15px; text-align: center; border-bottom: 4px solid var(--gold); }
-        .search-wrap { background-color: rgb(83, 92, 92); padding: 30px 10px; text-align: center; }
-        .search-container { position: relative; width: 95%; max-width: 500px; margin: 0 auto; display: flex; align-items: center; }
+        
+        /* Slideshow Background Styles */
+        .search-wrap { 
+            position: relative; 
+            padding: 50px 10px; 
+            text-align: center; 
+            overflow: hidden; 
+            background-color: rgb(83, 92, 92);
+        }
+        .search-wrap .bg-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+            z-index: 1;
+        }
+        .search-wrap .bg-slide.active {
+            opacity: 1;
+        }
+        .search-wrap .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 2;
+        }
+
+        .search-container { position: relative; width: 95%; max-width: 500px; margin: 0 auto; display: flex; align-items: center; z-index: 3; }
         #search-bar { width: 100%; padding: 12px 40px 12px 20px; border: none; border-radius: 50px; font-size: 14px; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .search-icon-btn { position: absolute; right: 15px; cursor: pointer; color: #666; font-size: 18px; border: none; background: transparent; }
 
@@ -39,7 +72,10 @@
     <h1><i class="fas fa-tools"></i> CATEGORIES</h1>
 </header>
 
-<div class="search-wrap">
+<div class="search-wrap" id="search-wrap">
+    <div class="bg-slide active" id="slide1"></div>
+    <div class="bg-slide" id="slide2"></div>
+    <div class="overlay"></div>
     <div class="search-container">
         <input type="text" id="search-bar" placeholder="Search in categories...">
         <button class="search-icon-btn"><i class="fas fa-search"></i></button>
@@ -55,6 +91,9 @@
 
 <script>
     let inventory = [];
+    let slideshowInterval = null;
+    let currentSlideIndex = 0;
+    let activeSlideElement = 1;
     const whatsappNumber = "256743462531";
     const categories = ['All', 'Power Tools', 'Hand Tools', 'Fasteners', 'Safety Gear', 'Plumbing', 'Electrical', 'Measuring Tools', 'Lubricants'];
 
@@ -65,7 +104,44 @@
             inventory = await response.json();
             renderCategories();
             filterProducts('All');
+            startSlideshow();
         } catch (e) { console.error("Error loading products:", e); }
+    }
+
+    function startSlideshow() {
+        if (slideshowInterval) clearInterval(slideshowInterval);
+
+        // Get images from the uploaded products dynamically
+        const images = inventory
+            .filter(p => p.image)
+            .map(p => p.image.startsWith('http') ? p.image : 'https://site-vctv.onrender.com' + p.image);
+
+        if (images.length === 0) return;
+
+        const slide1 = document.getElementById('slide1');
+        const slide2 = document.getElementById('slide2');
+
+        slide1.style.backgroundImage = `url('${images[0]}')`;
+        currentSlideIndex = 0;
+
+        if (images.length > 1) {
+            slideshowInterval = setInterval(() => {
+                currentSlideIndex = (currentSlideIndex + 1) % images.length;
+                const nextImageUrl = images[currentSlideIndex];
+
+                if (activeSlideElement === 1) {
+                    slide2.style.backgroundImage = `url('${nextImageUrl}')`;
+                    slide2.classList.add('active');
+                    slide1.classList.remove('active');
+                    activeSlideElement = 2;
+                } else {
+                    slide1.style.backgroundImage = `url('${nextImageUrl}')`;
+                    slide1.classList.add('active');
+                    slide2.classList.remove('active');
+                    activeSlideElement = 1;
+                }
+            }, 4000); // Transitions every 4 seconds
+        }
     }
 
     function renderCategories() {

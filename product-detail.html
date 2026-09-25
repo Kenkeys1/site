@@ -72,15 +72,22 @@
         const whatsappNumber = "256743462531";
         const SERVER_URL = "https://site-vctv.onrender.com";
 
+        // Helper function to format prices with commas
+        function formatPrice(priceVal) {
+            if (priceVal === undefined || priceVal === null || priceVal === '') return '';
+            const num = Number(priceVal.toString().replace(/,/g, '').replace('UGX', '').trim());
+            return !isNaN(num) ? num.toLocaleString('en-US') : priceVal;
+        }
+
         async function loadProductDetails() {
             const res = await fetch(`${SERVER_URL}/api/products`);
             const data = await res.json();
             
-            const p = data.find(item => item.id == productId);
+            const p = data.find(item => (item.id == productId || item._id == productId));
             if (p) {
-                document.getElementById('p-name').innerText = p.name;
-                document.getElementById('p-desc').innerText = p.specs;
-                document.getElementById('p-price').innerHTML = '<span style="color:#333; font-size:2.2rem;">UGX</span> ' + p.price;
+                document.getElementById('p-name').innerText = p.name || '';
+                document.getElementById('p-desc').innerText = p.specs || '';
+                document.getElementById('p-price').innerHTML = '<span style="color:#333; font-size:2.2rem;">UGX</span> ' + formatPrice(p.price);
                 document.getElementById('big-img').src = SERVER_URL + p.image;
                 document.getElementById('order-link').href = `https://wa.me/${whatsappNumber}?text=Hello, I want to order: ${p.name}`;
             }
@@ -88,11 +95,11 @@
             const container = document.getElementById('product-container');
             container.innerHTML = data.map(prod => `
                 <div class="card">
-                    <a href="product-detail.html?id=${prod.id}" style="text-decoration:none; color:inherit;">
+                    <a href="product-detail.html?id=${prod.id || prod._id || ''}" style="text-decoration:none; color:inherit;">
                         <img src="${SERVER_URL}${prod.image}" alt="${prod.name}">
-                        <h3>${prod.name}</h3>
-                        <p style="font-size:0.75rem; margin-bottom:5px;"><i class="fas fa-info-circle"></i> ${prod.specs}</p>
-                        <p class="price" style="font-size:1.1rem;"><span style="color:#333; font-size:0.9rem;">UGX</span> ${prod.price}</p>
+                        <h3>${prod.name || ''}</h3>
+                        <p style="font-size:0.75rem; margin-bottom:5px;"><i class="fas fa-info-circle"></i> ${prod.specs || ''}</p>
+                        <p class="price" style="font-size:1.1rem;"><span style="color:#333; font-size:0.9rem;">UGX</span> ${formatPrice(prod.price)}</p>
                     </a>
                     <a href="https://wa.me/${whatsappNumber}?text=Hello, I want to order: ${prod.name}" class="btn-whatsapp" target="_blank">
                         <i class="fab fa-whatsapp"></i> Order via WhatsApp
