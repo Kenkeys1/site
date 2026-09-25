@@ -18,7 +18,7 @@
     <input type="hidden" id="edit-id">
     <input type="text" id="name" placeholder="Name">
     <textarea id="specs" placeholder="Description"></textarea>
-    <input type="text" id="price" placeholder="Price (e.g. 50000)">
+    <input type="text" id="price" placeholder="Price (e.g. 50,000)">
     <select id="category">
         <option>Power Tools</option><option>Hand Tools</option>
         <option>Fasteners</option><option>Plumbing</option>
@@ -43,8 +43,11 @@
         
         formData.append('name', document.getElementById('name').value);
         formData.append('specs', document.getElementById('specs').value);
-        // Save the raw number only
-        formData.append('price', document.getElementById('price').value.replace('UGX ', ''));
+        
+        // Retire les virgules et 'UGX ' pour n'envoyer que le nombre pur au serveur
+        const rawPrice = document.getElementById('price').value.replace(/,/g, '').replace('UGX ', '').trim();
+        formData.append('price', rawPrice);
+        
         formData.append('category', document.getElementById('category').value);
         
         const imageFileInput = document.getElementById('image');
@@ -78,7 +81,13 @@
             list.innerHTML = data.map(p => {
                 const productId = p.id || p._id || '';
                 const imageUrl = p.image ? (p.image.startsWith('http') ? p.image : 'https://site-vctv.onrender.com' + p.image) : '';
-                const displayPrice = p.price !== undefined && p.price !== null ? p.price : '';
+                
+                // Formate le prix avec des virgules pour le tableau d'affichage
+                let displayPrice = '';
+                if (p.price !== undefined && p.price !== null && p.price !== '') {
+                    const num = Number(p.price.toString().replace(/,/g, ''));
+                    displayPrice = !isNaN(num) ? num.toLocaleString('en-US') : p.price;
+                }
                 
                 return `
                     <tr>
@@ -103,9 +112,15 @@
         document.getElementById('edit-id').value = p.id || p._id || '';
         document.getElementById('name').value = p.name || '';
         document.getElementById('specs').value = p.specs || '';
-        // Strip the UGX if it exists for clean editing
-        const rawPrice = p.price !== undefined && p.price !== null ? p.price.toString() : '';
-        document.getElementById('price').value = rawPrice.replace('UGX ', '');
+        
+        // Ajoute les virgules au prix lors de l'édition
+        let rawPrice = p.price !== undefined && p.price !== null ? p.price.toString().replace('UGX ', '').replace(/,/g, '').trim() : '';
+        if (!isNaN(rawPrice) && rawPrice !== '') {
+            document.getElementById('price').value = Number(rawPrice).toLocaleString('en-US');
+        } else {
+            document.getElementById('price').value = rawPrice;
+        }
+
         document.getElementById('category').value = p.category || '';
         document.getElementById('image').value = '';
         document.getElementById('form-title').innerText = "Edit Product";
@@ -138,13 +153,17 @@
         }
     }
 
-    loadInventory();
+    // Formate dynamiquement le champ prix pendant la saisie
     document.getElementById('price').addEventListener('input', (e) => {
-  let val = e.target.value.replace(/,/g, '');
-  if (!isNaN(val) && val !== '') {
-    e.target.value = Number(val).toLocaleString();
-  }
-});
+        let val = e.target.value.replace(/,/g, '');
+        if (!isNaN(val) && val !== '') {
+            e.target.value = Number(val).toLocaleString('en-US');
+        } else if (val === '') {
+            e.target.value = '';
+        }
+    });
+
+    loadInventory();
 </script>
 </body>
 </html>
