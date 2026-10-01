@@ -1,14 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Precision Hardware</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 20px; }
-        .form-box { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { border: 1px solid #ddddddf8; padding: 12px; }
-        .btn { padding: 8px 15px; cursor: pointer; }
+        :root { --onyx: #111111; --gold: #D4AF37; --white: #ffffff; --gray: #f4f4f4; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); padding: 20px; color: #333; }
+        
+        .form-box { background: var(--white); padding: 25px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 4px solid var(--gold); }
+        .form-box h3 { margin-bottom: 15px; color: var(--onyx); font-size: 1.4rem; }
+        
+        .form-box input[type="text"], 
+        .form-box textarea, 
+        .form-box select, 
+        .form-box input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-box input[type="text"]:focus, 
+        .form-box textarea:focus, 
+        .form-box select:focus {
+            border-color: var(--gold);
+        }
+        .form-box textarea { resize: vertical; height: 90px; }
+
+        table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        th, td { border: 1px solid #eee; padding: 12px 15px; text-align: left; vertical-align: middle; }
+        th { background: var(--onyx); color: var(--gold); font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+        
+        .btn { padding: 8px 15px; cursor: pointer; border-radius: 4px; border: none; font-weight: bold; background: var(--onyx); color: var(--gold); transition: 0.3s; }
+        .btn:hover { background: var(--gold); color: var(--onyx); }
+        
         /* Style for the UGX label */
         .price-tag { font-weight: bold; color: #353434; margin-right: 5px; }
+        
+        img { border-radius: 4px; object-fit: cover; border: 1px solid #ddd; background: #f9f9f9; }
     </style>
 </head>
 <body>
@@ -30,12 +65,16 @@
     <button class="btn" onclick="resetForm()">Cancel</button>
 </div>
 
+<input type="text" id="admin-search" placeholder="Search products to edit or fix..." style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95rem; outline: none; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+
 <table>
     <thead><tr><th>Image</th><th>Name</th><th>Specs</th><th>Price</th><th>Category</th><th>Action</th></tr></thead>
     <tbody id="product-list"></tbody>
 </table>
 
 <script>
+    let adminInventory = [];
+
     async function saveProduct() {
         const id = document.getElementById('edit-id').value;
         const formData = new FormData();
@@ -76,40 +115,45 @@
     async function loadInventory() {
         try {
             const res = await fetch('https://site-vctv.onrender.com/api/products');
-            const data = await res.json();
-            const list = document.getElementById('product-list');
-            
-            list.innerHTML = data.map(p => {
-                const productId = p.id || p._id || '';
-                const imageUrl = p.image ? (p.image.startsWith('http') ? p.image : 'https://site-vctv.onrender.com' + p.image) : '';
-                
-                // Formate le prix avec des virgules pour le tableau d'affichage
-                let displayPrice = '';
-                if (p.price !== undefined && p.price !== null && p.price !== '') {
-                    const num = Number(p.price.toString().replace(/,/g, ''));
-                    displayPrice = !isNaN(num) ? num.toLocaleString('en-US') : p.price;
-                }
-                
-                return `
-                    <tr>
-                        <td>${imageUrl ? `<img src="${imageUrl}" width="50">` : ''}</td>
-                        <td>${p.name || ''}</td>
-                        <td>${p.specs || ''}</td>
-                        <td><span class="price-tag">UGX</span> ${displayPrice}</td>
-                        <td>${p.category || ''}</td>
-                        <td>
-                            <button class="btn" onclick='editProduct(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Edit</button>
-                            <button class="btn" onclick="deleteProduct('${productId}')">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            adminInventory = await res.json();
+            renderTable(adminInventory);
         } catch (err) {
             console.error('Failed to load inventory:', err);
         }
     }
 
+    function renderTable(data) {
+        const list = document.getElementById('product-list');
+        
+        list.innerHTML = data.map(p => {
+            const productId = p.id || p._id || '';
+            const imageUrl = p.image ? (p.image.startsWith('http') || p.image.startsWith('data:') ? p.image : 'https://site-vctv.onrender.com' + p.image) : '';
+            
+            // Formate le prix avec des virgules pour le tableau d'affichage
+            let displayPrice = '';
+            if (p.price !== undefined && p.price !== null && p.price !== '') {
+                const num = Number(p.price.toString().replace(/,/g, ''));
+                displayPrice = !isNaN(num) ? num.toLocaleString('en-US') : p.price;
+            }
+            
+            return `
+                <tr>
+                    <td>${imageUrl ? `<img src="${imageUrl}" width="50" height="50">` : ''}</td>
+                    <td>${p.name || ''}</td>
+                    <td>${p.specs || ''}</td>
+                    <td><span class="price-tag">UGX</span> ${displayPrice}</td>
+                    <td>${p.category || ''}</td>
+                    <td>
+                        <button class="btn" onclick='editProduct(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Edit</button>
+                        <button class="btn" onclick="deleteProduct('${productId}')">Delete</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
     function editProduct(p) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         document.getElementById('edit-id').value = p.id || p._id || '';
         document.getElementById('name').value = p.name || '';
         document.getElementById('specs').value = p.specs || '';
@@ -162,6 +206,17 @@
         } else if (val === '') {
             e.target.value = '';
         }
+    });
+
+    // Recherche dynamique pour filtrer le tableau d'administration
+    document.getElementById('admin-search').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const filtered = adminInventory.filter(p => {
+            return (p.name && p.name.toLowerCase().includes(query)) ||
+                   (p.specs && p.specs.toLowerCase().includes(query)) ||
+                   (p.category && p.category.toLowerCase().includes(query));
+        });
+        renderTable(filtered);
     });
 
     loadInventory();
