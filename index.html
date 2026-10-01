@@ -162,7 +162,7 @@
         // Collect all valid image URLs from uploaded products
         const validImages = products
             .filter(p => p.image && p.image.trim() !== '')
-            .map(p => p.image.startsWith('http') ? p.image : 'https://site-vctv.onrender.com' + p.image);
+            .map(p => p.image.startsWith('http') || p.image.startsWith('data:') ? p.image : 'https://site-vctv.onrender.com' + p.image);
 
         if (validImages.length === 0) {
             slideshow.innerHTML = '';
@@ -227,15 +227,17 @@
                 formattedPrice = !isNaN(num) ? num.toLocaleString('en-US') : p.price;
             }
 
+            const imgUrl = p.image ? (p.image.startsWith('http') || p.image.startsWith('data:') ? p.image : 'https://site-vctv.onrender.com' + p.image) : '';
+
             return `
             <div class="card" style="cursor: pointer;">
                 <a href="product-detail.html?id=${p.id || p._id || ''}" style="text-decoration: none; color: inherit;">
-                    <img src="${p.image ? (p.image.startsWith('http') ? p.image : 'https://site-vctv.onrender.com' + p.image) : ''}" alt="${p.name}">
+                    <img src="${imgUrl}" alt="${p.name}">
                     <h3>${p.name}</h3>
                     <p><i class="fas fa-info-circle"></i> <strong>Specs:</strong> ${p.specs || ''}</p>
                     <p class="price"><span style="color:#333; font-size:0.9rem;">UGX</span> ${formattedPrice}</p>
                 </a>
-                <a href="https://wa.me/${whatsappNumber}?text=Hello, I want to order: ${p.name}" class="btn-whatsapp" target="_blank">
+                <a href="https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hello, I want to order: ' + p.name + '\nProduct Picture: ' + imgUrl)}" class="btn-whatsapp" target="_blank">
                     <i class="fab fa-whatsapp"></i> Order via WhatsApp
                 </a>
             </div>

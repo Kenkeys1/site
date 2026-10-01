@@ -14,10 +14,10 @@ const app = express();
 app.use(cors());
 
 // Parse JSON request bodies for standard API requests (e.g. non-file updates)
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Serve static uploaded images
+// Serve static uploaded images (kept for backward compatibility, though new images use Base64)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // --- MONGODB CONNECTION ---
@@ -75,10 +75,8 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
-});
+// Use memoryStorage so Multer keeps the file buffer in memory to convert to Base64
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // Helper middleware to catch Multer errors gracefully
@@ -116,12 +114,18 @@ app.post('/api/signup', upload.single('profileImage'), async (req, res) => {
       return res.status(400).json({ success: false, message: 'Username or Email already exists.' });
     }
 
+    let profileImageBase64 = '';
+    if (req.file) {
+      const b64 = Buffer.from(req.file.buffer).toString('base64');
+      profileImageBase64 = `data:${req.file.mimetype};base64,${b64}`;
+    }
+
     const newUser = new User({
       username: cleanUsername,
       email: cleanEmail,
       phone: cleanPhone,
       password: cleanPassword,
-      profileImage: req.file ? '/uploads/' + req.file.filename : ''
+      profileImage: profileImageBase64
     });
 
     await newUser.save();
@@ -177,7 +181,8 @@ app.post('/api/user/upload-photo', upload.single('profileImage'), async (req, re
 
     if (user) {
       if (req.file) {
-        user.profileImage = '/uploads/' + req.file.filename;
+        const b64 = Buffer.from(req.file.buffer).toString('base64');
+        user.profileImage = `data:${req.file.mimetype};base64,${b64}`;
         await user.save();
 
         const userObj = user.toJSON();
@@ -217,7 +222,8 @@ app.post('/api/products/add', handleUpload, async (req, res) => {
     }
 
     if (req.file) {
-      productData.image = '/uploads/' + req.file.filename;
+      const b64 = Buffer.from(req.file.buffer).toString('base64');
+      productData.image = `data:${req.file.mimetype};base64,${b64}`;
     }
 
     const newProduct = new Product(productData);
@@ -248,7 +254,8 @@ app.post('/api/products/edit', handleUpload, async (req, res) => {
       Object.assign(product, updateData);
 
       if (req.file) {
-        product.image = '/uploads/' + req.file.filename;
+        const b64 = Buffer.from(req.file.buffer).toString('base64');
+        product.image = `data:${req.file.mimetype};base64,${b64}`;
       }
 
       await product.save();
